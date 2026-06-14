@@ -6,9 +6,10 @@ en Java y Spring Boot, con PostgreSQL y arquitectura hexagonal simplificada.
 
 ## Estado actual
 
-El repositorio se encuentra en fase de foundation documental y de seguridad.
-Todavía no contiene código funcional, dependencias, Docker Compose ni
-configuración ejecutable.
+El repositorio contiene la foundation documental y la base técnica inicial de
+Spring Boot. Incluye configuración ejecutable, Docker Compose, perfiles por
+ambiente, Flyway, OpenAPI, Actuator y manejo global de errores. Todavía no
+implementa CRUD ni lógica financiera.
 
 ## Alcance MVP
 
@@ -24,8 +25,11 @@ configuración ejecutable.
 - Pruebas unitarias de servicios y controladores.
 - Docker Compose para PostgreSQL local.
 
-No forman parte del MVP: frontend, microservicios, autenticación JWT, créditos,
-intereses, comisiones, sobregiros e integraciones externas.
+No forman parte del MVP backend obligatorio: microservicios, autenticación JWT,
+créditos, intereses, comisiones, sobregiros e integraciones externas.
+
+El frontend podrá agregarse posteriormente como demo profesional, sin reemplazar
+el foco principal de la prueba técnica backend.
 
 ## Arquitectura
 
@@ -54,21 +58,20 @@ Las decisiones y reglas completas están en:
 - [Demostración local](docs/LOCAL_DEMO.md)
 - [Estrategia de pruebas](docs/TESTING_STRATEGY.md)
 
-## Tecnologías previstas
+## Tecnologías
 
-- Java 21
-- Spring Boot 3
-- Maven
+- Java 21.
+- Spring Boot 3.5.15.
+- Maven Wrapper 3.9.16.
 - Spring Web
 - Spring Data JPA
 - Jakarta Validation
-- PostgreSQL
+- PostgreSQL 17 para desarrollo local.
 - Flyway
-- Springdoc OpenAPI
+- Springdoc OpenAPI 2.8.17.
+- Spring Boot Actuator
 - JUnit 5, Mockito y MockMvc
 - Docker Compose
-
-Las versiones concretas se fijarán durante el bootstrap técnico.
 
 ## Configuración
 
@@ -79,6 +82,8 @@ La aplicación utilizará variables de entorno:
 | `SERVER_PORT` | Puerto HTTP de la aplicación |
 | `SPRING_PROFILES_ACTIVE` | Perfil activo |
 | `DATABASE_URL` | URL JDBC de PostgreSQL |
+| `DB_NAME` | Nombre de la base usada por Docker Compose |
+| `DB_PORT` | Puerto local publicado por PostgreSQL |
 | `DB_USERNAME` | Usuario de base de datos |
 | `DB_PASSWORD` | Contraseña de base de datos |
 | `CORS_ALLOWED_ORIGINS` | Orígenes CORS permitidos |
@@ -86,14 +91,68 @@ La aplicación utilizará variables de entorno:
 `.env.example` solo contiene nombres de variables. Los valores reales deben
 permanecer en `.env` o en el gestor de secretos del ambiente.
 
-Perfiles previstos:
+### Perfiles disponibles
 
 - `application.yml`: configuración común.
 - `application-local.yml`: desarrollo local mediante variables de entorno.
 - `application-test.yml`: configuración aislada para pruebas.
 - `application-cloud.yml`: configuración cloud basada en variables de entorno.
 
-Estos archivos se crearán durante el bootstrap de Spring Boot.
+La configuración común está en `application.yml`; los perfiles `local`,
+`test` y `cloud` separan las conexiones y ajustes por ambiente.
+
+## Ejecución local
+
+Requisitos:
+
+- Java 21.
+- Docker Desktop o Docker Engine con Compose.
+
+Maven no necesita instalación global porque el repositorio incluye Maven
+Wrapper.
+
+1. Crear el archivo local de variables:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+2. Configurar en `.env` valores locales no sensibles y una URL JDBC coherente
+   con PostgreSQL:
+
+```text
+SPRING_PROFILES_ACTIVE=local
+DATABASE_URL=jdbc:postgresql://localhost:5432/<database>
+```
+
+3. Levantar PostgreSQL:
+
+```powershell
+docker compose up -d
+docker compose ps
+```
+
+4. Ejecutar pruebas y aplicación:
+
+```powershell
+.\mvnw.cmd clean test
+.\mvnw.cmd spring-boot:run
+```
+
+5. Validar:
+
+- Health: `http://localhost:8080/actuator/health`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+
+Para detener la base de datos sin eliminar su volumen:
+
+```powershell
+docker compose down
+```
+
+No se debe usar `docker compose down -v` sin autorización, porque elimina los
+datos locales del volumen.
 
 ## Git Flow simplificado
 
@@ -104,8 +163,9 @@ Estos archivos se crearán durante el bootstrap de Spring Boot.
 - `feature/transaction-module`: transacciones.
 - `feature/testing-and-docs`: pruebas transversales y documentación.
 
-La foundation se prepara en `chore/project-foundation`. No se realizarán merges,
-pushes ni cambios sobre ramas protegidas sin autorización explícita.
+La foundation documental se creó en `chore/project-foundation` y la base técnica
+se preparó en `chore/spring-boot-bootstrap`. No se realizarán merges, pushes ni
+cambios sobre ramas protegidas sin autorización explícita.
 
 Convención de commits:
 

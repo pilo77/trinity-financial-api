@@ -2,11 +2,10 @@
 
 ## Estado
 
-La aplicación y `docker-compose.yml` todavía no han sido creados. Este documento
-define el flujo objetivo y se actualizará con comandos verificables durante el
-bootstrap técnico.
+La infraestructura local puede ejecutarse y validarse. Los módulos funcionales
+de clientes, cuentas y transacciones todavía no están implementados.
 
-## Prerrequisitos previstos
+## Prerrequisitos
 
 - Java 21
 - Maven Wrapper incluido en el repositorio
@@ -15,7 +14,7 @@ bootstrap técnico.
 
 No será necesario instalar Maven globalmente si se utiliza `mvnw`.
 
-## Configuración local prevista
+## Configuración local
 
 1. Crear `.env` a partir de `.env.example`.
 2. Completar las variables únicamente en `.env`.
@@ -29,6 +28,8 @@ Variables requeridas:
 SERVER_PORT
 SPRING_PROFILES_ACTIVE
 DATABASE_URL
+DB_NAME
+DB_PORT
 DB_USERNAME
 DB_PASSWORD
 CORS_ALLOWED_ORIGINS
@@ -36,7 +37,7 @@ CORS_ALLOWED_ORIGINS
 
 Los valores reales no deben aparecer en documentación, commits, logs o capturas.
 
-## Flujo de demostración previsto
+## Flujo funcional pendiente
 
 1. Levantar PostgreSQL.
 2. Ejecutar migraciones Flyway al iniciar la aplicación.
@@ -64,5 +65,22 @@ Los valores reales no deben aparecer en documentación, commits, logs o capturas
 - Rollback completo ante una transferencia fallida.
 - Ningún secreto visible.
 
-Los comandos y URLs exactos se documentarán después de crear y validar la
-aplicación.
+## Comandos
+
+```powershell
+Copy-Item .env.example .env
+docker compose up -d
+.\mvnw.cmd clean test
+.\mvnw.cmd spring-boot:run
+```
+
+Validaciones de infraestructura:
+
+```text
+GET http://localhost:8080/actuator/health
+GET http://localhost:8080/v3/api-docs
+GET http://localhost:8080/swagger-ui.html
+```
+
+La demostración funcional se completará cuando existan los módulos de clientes,
+cuentas y transacciones.
