@@ -1,5 +1,6 @@
 package com.trinity.financial.shared.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.time.LocalDateTime;
@@ -58,6 +59,18 @@ public class GlobalExceptionHandler {
     ResponseEntity<ProblemDetail> handleUnreadableMessage(
             HttpMessageNotReadableException exception,
             HttpServletRequest request) {
+        if (exception.getCause() instanceof InvalidFormatException invalidFormat
+                && invalidFormat.getTargetType().isEnum()) {
+            String field = invalidFormat.getPath().isEmpty()
+                    ? "desconocido"
+                    : invalidFormat.getPath().getLast().getFieldName();
+            ProblemDetail problem = createProblem(
+                    HttpStatus.BAD_REQUEST,
+                    "INVALID_ENUM_VALUE",
+                    "El valor del campo '" + field + "' no es válido.",
+                    request.getRequestURI());
+            return ResponseEntity.badRequest().body(problem);
+        }
         ProblemDetail problem = createProblem(
                 HttpStatus.BAD_REQUEST,
                 "MALFORMED_REQUEST",
@@ -73,7 +86,7 @@ public class GlobalExceptionHandler {
         ProblemDetail problem = createProblem(
                 HttpStatus.BAD_REQUEST,
                 "INVALID_PARAMETER",
-                "Uno de los parámetros de la solicitud no tiene un formato válido.",
+                "El parámetro '" + exception.getName() + "' no tiene un valor válido.",
                 request.getRequestURI());
         return ResponseEntity.badRequest().body(problem);
     }

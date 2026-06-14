@@ -5,7 +5,7 @@
 | HU-001 | Project foundation | DONE |
 | HU-002 | Spring Boot bootstrap | DONE |
 | HU-003 | Customer CRUD | DONE |
-| HU-004 | Account management | PENDING |
+| HU-004 | Account management | DONE |
 | HU-005 | Financial transactions | PENDING |
 | HU-006 | Account statement | PENDING |
 | HU-007 | Tests and docs | PENDING |
@@ -79,3 +79,50 @@ feat(customers): implement customer CRUD
 - CRUD HTTP validado de extremo a extremo con base H2 en memoria.
 - Pruebas unitarias de servicio y pruebas MockMvc del controlador.
 - Build completo validado con `mvn clean verify`.
+
+## HU-004 - Account Management
+
+### Estado
+
+DONE
+
+### Implementación
+
+- Se resolvieron documentalmente los hallazgos P0, P1 y P2 de la auditoría.
+- Se definió que `SAVINGS` y `CHECKING` se crean en estado `ACTIVE`, indicando
+  por separado el requisito y la decisión del MVP.
+- Se formalizó la semántica de `balance` y `availableBalance`.
+- Se fijó un máximo de 5 intentos para generar un número de cuenta único.
+- Se separaron el cambio de estado operativo y la cancelación.
+- Se validaron V1 y V2 sobre PostgreSQL real.
+- Se confirmó que la tabla `accounts` ya tiene las columnas, constraints e
+  índice requeridos, por lo que no se justifica una migración V3.
+- Se implementaron creación, consultas, listado paginado y filtrado.
+- Se implementaron activación, inactivación y cancelación lógica.
+- Se mantuvieron fuera de alcance transacciones, movimientos y frontend.
+
+### Endpoints
+
+```text
+POST  /api/v1/accounts
+GET   /api/v1/accounts
+GET   /api/v1/accounts/{id}
+GET   /api/v1/accounts/number/{accountNumber}
+PATCH /api/v1/accounts/{id}/status
+PATCH /api/v1/accounts/{id}/cancel
+```
+
+### Pruebas
+
+- Pruebas unitarias de `AccountService`.
+- Pruebas MockMvc de `AccountController`.
+- Cobertura de tipos, prefijos, saldos, GMF, estados, cancelación, filtros y
+  errores controlados.
+- Cobertura de rechazo de saldos negativos en la frontera de entidad.
+- Cobertura de filtros `accountType` y `status` inválidos con respuesta `400`.
+
+### Commit esperado
+
+```text
+feat(accounts): implement account management
+```
