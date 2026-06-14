@@ -113,19 +113,29 @@ Entrada prevista:
 }
 ```
 
-El número, estado, saldo y saldo disponible son asignados por el sistema.
+`gmfExempt` es opcional y toma `false` por defecto cuando no se envía.
+
+El número y el estado son asignados por el sistema. Tanto `SAVINGS` como
+`CHECKING` se crean en estado `ACTIVE`; para `SAVINGS` es un requisito del
+enunciado y para `CHECKING` es una decisión documentada del MVP.
+
+`balance` y `availableBalance` se inicializan con `BigDecimal.ZERO` y no pueden
+ser proporcionados por el consumidor.
 
 - `201 Created`: cuenta creada.
-- `400 Bad Request`: solicitud inválida.
+- `400 Bad Request`: solicitud inválida. Un `accountType` desconocido debe
+  producir un mensaje claro y nunca un error `500`.
 - `404 Not Found`: cliente inexistente.
+- `409 Conflict`: no fue posible generar un número único después de 5 intentos.
 
 ### Listar cuentas
 
 ```http
-GET /api/v1/accounts?customerId={customerId}&status=ACTIVE&page=0&size=20
+GET /api/v1/accounts?customerId={customerId}&accountType=SAVINGS&status=ACTIVE&page=0&size=20&sort=createdAt,desc
 ```
 
 - `200 OK`: página de cuentas.
+- `400 Bad Request`: filtros, paginación u ordenamiento inválidos.
 
 ### Consultar cuenta
 
@@ -142,12 +152,21 @@ GET /api/v1/accounts/{id}
 PATCH /api/v1/accounts/{id}/status
 ```
 
-Permitirá transiciones entre `ACTIVE` e `INACTIVE`. La cancelación tiene una
-operación independiente.
+Entrada prevista:
+
+```json
+{
+  "status": "INACTIVE"
+}
+```
+
+Solo permite `ACTIVE` o `INACTIVE`. No permite enviar `CANCELLED` ni reactivar
+una cuenta cancelada. La cancelación tiene una operación independiente.
 
 - `200 OK`: estado actualizado.
-- `400 Bad Request`: transición inválida.
+- `400 Bad Request`: estado solicitado inválido.
 - `404 Not Found`: cuenta inexistente.
+- `409 Conflict`: transición no permitida por el estado actual.
 
 ### Cancelar cuenta
 
@@ -155,9 +174,13 @@ operación independiente.
 PATCH /api/v1/accounts/{id}/cancel
 ```
 
+La cancelación requiere que `balance` y `availableBalance` sean ambos
+exactamente cero.
+
 - `200 OK`: cuenta marcada como `CANCELLED`.
 - `404 Not Found`: cuenta inexistente.
-- `409 Conflict`: saldo diferente de cero o cuenta ya cancelada.
+- `409 Conflict`: alguno de los saldos es diferente de cero o la cuenta ya está
+  cancelada.
 
 ### Consultar estado de cuenta
 
