@@ -8,8 +8,9 @@ en Java y Spring Boot, con PostgreSQL y arquitectura hexagonal simplificada.
 
 El repositorio contiene la foundation documental y la base técnica inicial de
 Spring Boot. Incluye configuración ejecutable, Docker Compose, perfiles por
-ambiente, Flyway, OpenAPI, Actuator y manejo global de errores. Todavía no
-implementa CRUD ni lógica financiera.
+ambiente, Flyway, OpenAPI, Actuator y manejo global de errores. El CRUD de
+clientes está implementado; cuentas y transacciones financieras siguen
+pendientes.
 
 ## Alcance MVP
 
