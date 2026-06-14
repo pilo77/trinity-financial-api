@@ -15,6 +15,14 @@ Las entidades JPA no se exponen directamente.
 
 ## Clientes
 
+Resumen de endpoints:
+
+- `POST /api/v1/customers`
+- `GET /api/v1/customers`
+- `GET /api/v1/customers/{id}`
+- `PUT /api/v1/customers/{id}`
+- `DELETE /api/v1/customers/{id}`
+
 ### Crear cliente
 
 ```http
@@ -96,6 +104,16 @@ DELETE /api/v1/customers/{id}
 - `409 Conflict`: el cliente tiene cuentas vinculadas.
 
 ## Cuentas
+
+Resumen de endpoints:
+
+- `POST /api/v1/accounts`
+- `GET /api/v1/accounts`
+- `GET /api/v1/accounts/{id}`
+- `GET /api/v1/accounts/number/{accountNumber}`
+- `PATCH /api/v1/accounts/{id}/status`
+- `PATCH /api/v1/accounts/{id}/cancel`
+- `GET /api/v1/accounts/number/{accountNumber}/statement`
 
 ### Crear cuenta
 
@@ -211,6 +229,13 @@ La respuesta del estado de cuenta incluye:
 - Fecha de generación del statement.
 
 ## Transacciones
+
+Resumen de endpoints:
+
+- `POST /api/v1/transactions/deposits`
+- `POST /api/v1/transactions/withdrawals`
+- `POST /api/v1/transactions/transfers`
+- `GET /api/v1/transactions/{id}`
 
 ### Consignar
 

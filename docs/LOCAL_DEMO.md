@@ -76,7 +76,7 @@ Los valores reales no deben aparecer en documentación, commits, logs o capturas
 ```powershell
 Copy-Item .env.example .env
 docker compose up -d
-.\mvnw.cmd clean test
+.\mvnw.cmd clean verify
 .\mvnw.cmd spring-boot:run
 ```
 

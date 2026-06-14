@@ -6,11 +6,18 @@ en Java y Spring Boot, con PostgreSQL y arquitectura hexagonal simplificada.
 
 ## Estado actual
 
-El repositorio contiene la foundation documental y la base técnica inicial de
-Spring Boot. Incluye configuración ejecutable, Docker Compose, perfiles por
-ambiente, Flyway, OpenAPI, Actuator y manejo global de errores. El CRUD de
-clientes está implementado; cuentas y transacciones financieras siguen
-pendientes.
+El repositorio contiene la base técnica completa del backend obligatorio y la
+documentación principal de la prueba técnica. Incluye configuración ejecutable,
+Docker Compose, perfiles por ambiente, Flyway, OpenAPI, Actuator y manejo
+global de errores. El backend funcional está implementado en sus módulos de
+clientes, cuentas, transacciones y estado de cuenta.
+
+Módulos implementados:
+
+- Clientes.
+- Cuentas de ahorro y cuentas corrientes.
+- Transacciones financieras.
+- Consulta de estado de cuenta.
 
 ## Alcance MVP
 
@@ -31,6 +38,9 @@ créditos, intereses, comisiones, sobregiros e integraciones externas.
 
 El frontend podrá agregarse posteriormente como demo profesional, sin reemplazar
 el foco principal de la prueba técnica backend.
+
+El despliegue cloud también queda fuera del backend obligatorio y se reservará
+para una fase posterior si el alcance lo permite.
 
 ## Arquitectura
 
@@ -92,6 +102,9 @@ La aplicación utilizará variables de entorno:
 `.env.example` solo contiene nombres de variables. Los valores reales deben
 permanecer en `.env` o en el gestor de secretos del ambiente.
 
+`.env` no se versiona. Ese archivo debe permanecer local y nunca incluirse en
+commits ni en capturas compartidas.
+
 ### Perfiles disponibles
 
 - `application.yml`: configuración común.
@@ -136,7 +149,7 @@ docker compose ps
 4. Ejecutar pruebas y aplicación:
 
 ```powershell
-.\mvnw.cmd clean test
+.\mvnw.cmd clean verify
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -202,11 +215,11 @@ docs: add local setup and API usage guide
 
 ## Definition of Done
 
-- `mvn clean verify` finaliza correctamente.
+- La validación completa con Maven Wrapper finaliza correctamente.
 - Migraciones Flyway funcionan desde una base vacía.
 - Docker Compose levanta PostgreSQL.
 - Swagger publica el contrato acordado.
-- CRUD y operaciones financieras están validados.
+- CRUD, cuentas, transacciones y estado de cuenta están validados.
 - README y documentos están actualizados.
 - No hay secretos ni archivos generados rastreados.
 - El estado Git está limpio o explicado.
