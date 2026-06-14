@@ -3,7 +3,7 @@
 ## Estado
 
 La infraestructura local, clientes, cuentas y transacciones financieras pueden
-ejecutarse y validarse. El estado de cuenta todavía no está implementado.
+ejecutarse y validarse. El estado de cuenta ya está implementado.
 
 ## Prerrequisitos
 
@@ -57,7 +57,8 @@ Los valores reales no deben aparecer en documentación, commits, logs o capturas
 16. Transferir entre cuentas y verificar los movimientos débito y crédito.
 17. Intentar retirar sin fondos y operar una cuenta no activa.
 18. Consultar una transacción por UUID.
-19. Consultar el estado de cuenta cuando HU-006 esté lista.
+19. Consultar el estado de cuenta por número de cuenta con filtros de fechas y
+	paginación.
 
 ## Validaciones esperadas
 
@@ -87,4 +88,5 @@ GET http://localhost:8080/v3/api-docs
 GET http://localhost:8080/swagger-ui.html
 ```
 
-La demostración backend completa se cerrará cuando exista el estado de cuenta.
+La demostración backend completa incluye ahora el estado de cuenta y se puede
+validar sin crear datos adicionales fuera del flujo financiero existente.

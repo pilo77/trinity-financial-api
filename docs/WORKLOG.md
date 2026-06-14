@@ -7,7 +7,7 @@
 | HU-003 | Customer CRUD | DONE |
 | HU-004 | Account management | DONE |
 | HU-005 | Financial transactions | DONE |
-| HU-006 | Account statement | IN PROGRESS |
+| HU-006 | Account statement | DONE |
 | HU-007 | Tests and docs | PENDING |
 | HU-008 | Frontend demo | PENDING |
 | HU-009 | Cloud deploy | PENDING |
@@ -171,4 +171,32 @@ El plan fue aprobado antes de implementar.
 
 ```text
 feat(transactions): implement financial transactions
+```
+
+## HU-006 - Account Statement
+
+### Estado
+
+DONE
+
+### Implementación
+
+- Se implementó la consulta de estado de cuenta por número de cuenta.
+- Se reutilizó `AccountMovement` como fuente principal del historial.
+- Se incluyeron filtros opcionales por rango de fechas y paginación.
+- Se devolvieron saldos actuales y movimientos `DEBIT` / `CREDIT` sin crear
+  transacciones nuevas ni modificar saldos.
+- Se documentó el contrato REST y la demostración local.
+
+### Pruebas
+
+- Pruebas unitarias de `AccountStatementService`.
+- Pruebas MockMvc de `AccountStatementController`.
+- Cobertura de cuenta existente, cuenta sin movimientos, cuenta inexistente,
+  rango de fechas inválido y paginación.
+
+### Commit esperado
+
+```text
+feat(statement): implement account statement query
 ```

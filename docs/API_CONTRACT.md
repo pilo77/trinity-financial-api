@@ -195,12 +195,20 @@ exactamente cero.
 ### Consultar estado de cuenta
 
 ```http
-GET /api/v1/accounts/number/{accountNumber}/statement?from={dateTime}&to={dateTime}&page=0&size=20
+GET /api/v1/accounts/number/{accountNumber}/statement?startDate={dateTime}&endDate={dateTime}&page=0&size=20&sort=createdAt,desc
 ```
 
-- `200 OK`: movimientos construidos desde `AccountMovement`.
-- `400 Bad Request`: rango de fechas inválido.
+- `200 OK`: estado de cuenta con balance actual, availableBalance actual,
+  movimientos `DEBIT`/`CREDIT` y metadatos de paginación.
+- `400 Bad Request`: número de cuenta inválido o rango de fechas inválido.
 - `404 Not Found`: número de cuenta inexistente.
+
+La respuesta del estado de cuenta incluye:
+
+- Información básica de la cuenta (`accountNumber`, `accountType`, `status`).
+- Saldos actuales (`balance`, `availableBalance`).
+- Lista paginada de movimientos construida desde `AccountMovement`.
+- Fecha de generación del statement.
 
 ## Transacciones
 
