@@ -6,7 +6,7 @@
 | HU-002 | Spring Boot bootstrap | DONE |
 | HU-003 | Customer CRUD | DONE |
 | HU-004 | Account management | DONE |
-| HU-005 | Financial transactions | PENDING |
+| HU-005 | Financial transactions | DONE |
 | HU-006 | Account statement | PENDING |
 | HU-007 | Tests and docs | PENDING |
 | HU-008 | Frontend demo | PENDING |
@@ -125,4 +125,50 @@ PATCH /api/v1/accounts/{id}/cancel
 
 ```text
 feat(accounts): implement account management
+```
+
+## HU-005 - Financial Transactions
+
+### Estado
+
+DONE
+
+### Actividad actual
+
+- HU-004 fue integrada en `develop` mediante merge no fast-forward.
+- El resultado integrado fue validado con `mvn clean verify`.
+- Se ejecutaron V1/V2 sobre PostgreSQL 17 limpio y se auditó el esquema real de
+  transacciones y movimientos mediante catálogos del motor.
+- Se detectó que `financial_transactions.transaction_date` no existe y se
+  planificó una migración V3 para incorporarla durante la implementación.
+- Se definieron atomicidad, bloqueos y orden determinista para transferencias.
+- Se formalizó la semántica de transacción y movimientos por operación.
+- Se formalizó la validación decimal con `@NotNull`, `@Positive` y `@Digits`.
+- Se definió la composición de `TransactionResponse` sin invadir HU-006.
+- Se estableció como obligatoria la prueba de integración de rollback.
+
+### Gate
+
+El plan fue aprobado antes de implementar.
+
+### Implementación
+
+- Se creó y validó V3 sobre PostgreSQL 17 limpio.
+- Se implementaron consignaciones, retiros, transferencias y consulta por UUID.
+- Se actualizaron conjuntamente `balance` y `availableBalance`.
+- Se persistieron transacciones exitosas y movimientos contables.
+- Se añadieron bloqueos pesimistas y orden lexicográfico para transferencias.
+- Se mantuvo HU-006 fuera de alcance.
+
+### Pruebas
+
+- Pruebas unitarias de `TransactionService`.
+- Pruebas MockMvc de `TransactionController`.
+- Prueba de integración obligatoria de rollback.
+- Validación de escala decimal, estados, fondos, movimientos y relaciones.
+
+### Commit esperado
+
+```text
+feat(transactions): implement financial transactions
 ```
