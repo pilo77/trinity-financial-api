@@ -2,8 +2,8 @@
 
 ## Estado
 
-La infraestructura local puede ejecutarse y validarse. Los módulos funcionales
-de clientes, cuentas y transacciones todavía no están implementados.
+La infraestructura local y el CRUD de clientes pueden ejecutarse y validarse.
+Los módulos de cuentas y transacciones todavía no están implementados.
 
 ## Prerrequisitos
 
@@ -37,22 +37,21 @@ CORS_ALLOWED_ORIGINS
 
 Los valores reales no deben aparecer en documentación, commits, logs o capturas.
 
-## Flujo funcional pendiente
+## Flujo de demostración
 
 1. Levantar PostgreSQL.
 2. Ejecutar migraciones Flyway al iniciar la aplicación.
 3. Comprobar el health check.
 4. Abrir Swagger UI.
-5. Crear un cliente mayor de edad.
-6. Crear una cuenta de ahorro y una cuenta corriente.
-7. Verificar prefijos, longitud, estado, saldos y atributo GMF.
-8. Realizar una consignación.
-9. Realizar un retiro.
-10. Realizar una transferencia.
-11. Consultar el estado de cuenta por número.
-12. Comprobar movimientos débito y crédito.
-13. Intentar eliminar un cliente con cuentas y verificar el rechazo.
-14. Dejar una cuenta en saldo cero y cancelarla.
+5. Crear, consultar, actualizar, listar y eliminar un cliente mayor de edad.
+6. Comprobar validaciones de correo, nombres, edad y duplicados.
+7. Crear una cuenta de ahorro y una cuenta corriente cuando HU-004 esté lista.
+8. Verificar prefijos, longitud, estado, saldos y atributo GMF.
+9. Realizar consignación, retiro y transferencia cuando HU-005 esté lista.
+10. Consultar el estado de cuenta por número cuando HU-006 esté lista.
+11. Comprobar movimientos débito y crédito.
+12. Intentar eliminar un cliente con cuentas y verificar el rechazo.
+13. Dejar una cuenta en saldo cero y cancelarla.
 
 ## Validaciones esperadas
 
@@ -82,5 +81,5 @@ GET http://localhost:8080/v3/api-docs
 GET http://localhost:8080/swagger-ui.html
 ```
 
-La demostración funcional se completará cuando existan los módulos de clientes,
+La demostración funcional completa se cerrará cuando existan los módulos de
 cuentas y transacciones.

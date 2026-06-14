@@ -11,8 +11,7 @@
 - Fechas y horas: formato ISO 8601
 - Listados: paginados cuando aplique
 
-Los DTO definitivos y ejemplos OpenAPI se concretarán durante la implementación.
-Las entidades JPA no se expondrán directamente.
+Las entidades JPA no se exponen directamente.
 
 ## Clientes
 
@@ -22,8 +21,19 @@ Las entidades JPA no se expondrán directamente.
 POST /api/v1/customers
 ```
 
-Entrada prevista: documento, nombres, apellidos, correo, teléfono y fecha de
-nacimiento.
+Entrada:
+
+```json
+{
+  "documentType": "CC",
+  "documentNumber": "123456789",
+  "firstName": "Carlos",
+  "lastName": "Villamil",
+  "email": "carlos@example.com",
+  "phone": "3000000000",
+  "birthDate": "1990-01-01"
+}
+```
 
 Respuestas:
 
@@ -38,6 +48,19 @@ GET /api/v1/customers?page=0&size=20
 ```
 
 - `200 OK`: página de clientes.
+
+La respuesta paginada contiene:
+
+```json
+{
+  "content": [],
+  "page": 0,
+  "size": 20,
+  "totalElements": 0,
+  "totalPages": 0,
+  "last": true
+}
+```
 
 ### Consultar cliente
 
@@ -55,6 +78,7 @@ PUT /api/v1/customers/{id}
 ```
 
 La actualización vuelve a validar mayoría de edad, documento y correo.
+El cuerpo utiliza los mismos campos obligatorios de la creación.
 
 - `200 OK`: cliente actualizado.
 - `400 Bad Request`: datos inválidos o menor de edad.
