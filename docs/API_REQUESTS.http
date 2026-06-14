@@ -1,0 +1,113 @@
+### Customers
+
+### Crear cliente válido
+POST http://localhost:8080/api/v1/customers
+Content-Type: application/json
+
+{
+  "documentType": "CC",
+  "documentNumber": "123456789",
+  "firstName": "Carlos",
+  "lastName": "Villamil",
+  "email": "carlos@example.com",
+  "phone": "3000000000",
+  "birthDate": "1990-01-01"
+}
+
+### Intentar cliente menor de edad
+POST http://localhost:8080/api/v1/customers
+Content-Type: application/json
+
+{
+  "documentType": "CC",
+  "documentNumber": "987654321",
+  "firstName": "Ana",
+  "lastName": "Perez",
+  "email": "ana@example.com",
+  "phone": "3000000001",
+  "birthDate": "2010-01-01"
+}
+
+### Listar clientes
+GET http://localhost:8080/api/v1/customers?page=0&size=20
+
+### Accounts
+
+### Crear cuenta de ahorro
+POST http://localhost:8080/api/v1/accounts
+Content-Type: application/json
+
+{
+  "customerId": "UUID_DEL_CLIENTE",
+  "accountType": "SAVINGS",
+  "gmfExempt": false
+}
+
+### Crear cuenta corriente
+POST http://localhost:8080/api/v1/accounts
+Content-Type: application/json
+
+{
+  "customerId": "UUID_DEL_CLIENTE",
+  "accountType": "CHECKING",
+  "gmfExempt": false
+}
+
+### Transactions
+
+### Consignar
+POST http://localhost:8080/api/v1/transactions/deposits
+Content-Type: application/json
+
+{
+  "accountNumber": "5300000001",
+  "amount": 100000.00,
+  "description": "Consignación"
+}
+
+### Retirar
+POST http://localhost:8080/api/v1/transactions/withdrawals
+Content-Type: application/json
+
+{
+  "accountNumber": "5300000001",
+  "amount": 50000.00,
+  "description": "Retiro"
+}
+
+### Transferir
+POST http://localhost:8080/api/v1/transactions/transfers
+Content-Type: application/json
+
+{
+  "sourceAccountNumber": "5300000001",
+  "destinationAccountNumber": "3300000001",
+  "amount": 25000.00,
+  "description": "Transferencia"
+}
+
+### Consultar transacción
+GET http://localhost:8080/api/v1/transactions/UUID_DE_LA_TRANSACCION
+
+### Account Statement
+
+### Consultar estado de cuenta
+GET http://localhost:8080/api/v1/accounts/number/5300000001/statement?startDate=2026-01-01T00:00:00&endDate=2026-12-31T23:59:59&page=0&size=20&sort=createdAt,desc
+
+### Cancelar cuenta con saldo cero
+PATCH http://localhost:8080/api/v1/accounts/UUID_DE_LA_CUENTA/cancel
+
+### Error cases
+
+### Retiro sin fondos
+POST http://localhost:8080/api/v1/transactions/withdrawals
+Content-Type: application/json
+
+{
+  "accountNumber": "5300000001",
+  "amount": 9999999.99,
+  "description": "Retiro sin fondos"
+}
+
+### Rango de fechas inválido
+GET http://localhost:8080/api/v1/accounts/number/5300000001/statement?startDate=2026-12-31T23:59:59&endDate=2026-01-01T00:00:00&page=0&size=20&sort=createdAt,desc

@@ -8,7 +8,7 @@
 | HU-004 | Account management | DONE |
 | HU-005 | Financial transactions | DONE |
 | HU-006 | Account statement | DONE |
-| HU-007 | Tests and docs | PENDING |
+| HU-007 | Tests and docs | IN PROGRESS |
 | HU-008 | Frontend demo | PENDING |
 | HU-009 | Cloud deploy | PENDING |
 

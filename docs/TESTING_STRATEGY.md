@@ -102,6 +102,19 @@ cubrir:
 - Manejo de errores.
 - Atomicidad de transferencias.
 
+## Estado actual de la suite
+
+- Total actual: 77 pruebas.
+- Resultado actual: `BUILD SUCCESS`.
+- Cobertura por módulo:
+	- `CustomerService` y `AccountService` validan reglas de negocio y casos
+		negativos de cliente y cuenta.
+	- `TransactionService` e `TransactionServiceIntegrationTest` validan saldos,
+		movimientos y rollback.
+	- `AccountStatementService` valida consultas, filtros, paginación y errores.
+	- `AccountController`, `CustomerController`, `TransactionController` y el
+		controlador de estado de cuenta validan contrato HTTP con MockMvc.
+
 ## Comandos objetivo
 
 Una vez creado el proyecto:
