@@ -1,0 +1,49 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+secrets.*
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Java and build outputs
+target/
+build/
+out/
+*.class
+
+# IDE and editor settings
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# Logs and reports
+*.log
+logs/
+coverage/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Local databases and Docker volumes
+docker-data/
+pgdata/
+*.db
+
+# Temporary and backup files
+.cache/
+*.tmp
+*.bak
+*.swp
+*~
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
