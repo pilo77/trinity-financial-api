@@ -7,7 +7,7 @@
 | HU-003 | Customer CRUD | DONE |
 | HU-004 | Account management | DONE |
 | HU-005 | Financial transactions | DONE |
-| HU-006 | Account statement | PENDING |
+| HU-006 | Account statement | IN PROGRESS |
 | HU-007 | Tests and docs | PENDING |
 | HU-008 | Frontend demo | PENDING |
 | HU-009 | Cloud deploy | PENDING |
