@@ -2,10 +2,10 @@
 
 ## Estado
 
-PLAN UPDATED - PENDING APPROVAL
+APPROVED - IMPLEMENTED
 
-Este documento resuelve los hallazgos P0, P1 y P2 de la auditoría técnica.
-No autoriza todavía la implementación funcional de HU-004.
+Este documento resolvió los hallazgos P0, P1 y P2 de la auditoría técnica. El
+plan fue aprobado antes de iniciar la implementación funcional de HU-004.
 
 ## Objetivo
 
@@ -234,7 +234,8 @@ migración V3 porque no existe un cambio de esquema que la justifique.
 - **Errores de enum como 500:** manejo global y prueba MockMvc específica.
 - **Ampliación accidental de alcance:** HU-005 y HU-006 permanecen excluidas.
 
-## Gate de aprobación
+## Cierre del gate
 
-No se crearán `AccountEntity`, servicio, controlador, DTOs, mapper, generador ni
-pruebas hasta recibir aprobación explícita de este plan.
+La aprobación explícita fue recibida antes de crear `AccountEntity`, servicio,
+controlador, DTOs, mapper, generador y pruebas. HU-004 se implementó respetando
+el alcance definido en este plan.

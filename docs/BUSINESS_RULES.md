@@ -36,6 +36,9 @@
 17. La cancelación usa una operación separada y solo se permite cuando
     `balance` y `availableBalance` son ambos exactamente cero.
 18. La cancelación cambia el estado a `CANCELLED`; no elimina la cuenta.
+19. Ninguna cuenta, incluida una cuenta `SAVINGS`, puede persistir `balance` o
+    `availableBalance` negativos. La entidad y los constraints de base de datos
+    protegen esta regla.
 
 ## Valores monetarios
 

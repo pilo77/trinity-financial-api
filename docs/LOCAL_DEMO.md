@@ -2,8 +2,9 @@
 
 ## Estado
 
-La infraestructura local y el CRUD de clientes pueden ejecutarse y validarse.
-Los módulos de cuentas y transacciones todavía no están implementados.
+La infraestructura local, el CRUD de clientes y la administración de cuentas
+pueden ejecutarse y validarse. Las transacciones financieras y el estado de
+cuenta todavía no están implementados.
 
 ## Prerrequisitos
 
@@ -45,13 +46,15 @@ Los valores reales no deben aparecer en documentación, commits, logs o capturas
 4. Abrir Swagger UI.
 5. Crear, consultar, actualizar, listar y eliminar un cliente mayor de edad.
 6. Comprobar validaciones de correo, nombres, edad y duplicados.
-7. Crear una cuenta de ahorro y una cuenta corriente cuando HU-004 esté lista.
+7. Crear una cuenta de ahorro y una cuenta corriente para el cliente.
 8. Verificar prefijos, longitud, estado, saldos y atributo GMF.
-9. Realizar consignación, retiro y transferencia cuando HU-005 esté lista.
-10. Consultar el estado de cuenta por número cuando HU-006 esté lista.
-11. Comprobar movimientos débito y crédito.
-12. Intentar eliminar un cliente con cuentas y verificar el rechazo.
-13. Dejar una cuenta en saldo cero y cancelarla.
+9. Listar cuentas usando filtros por cliente, tipo y estado.
+10. Consultar una cuenta por UUID y por número de cuenta.
+11. Inactivar y volver a activar una cuenta.
+12. Cancelar una cuenta con ambos saldos en cero y comprobar que no se reactive.
+13. Intentar eliminar un cliente con cuentas y verificar el rechazo.
+14. Realizar consignación, retiro y transferencia cuando HU-005 esté lista.
+15. Consultar el estado de cuenta cuando HU-006 esté lista.
 
 ## Validaciones esperadas
 
@@ -81,5 +84,5 @@ GET http://localhost:8080/v3/api-docs
 GET http://localhost:8080/swagger-ui.html
 ```
 
-La demostración funcional completa se cerrará cuando existan los módulos de
-cuentas y transacciones.
+La demostración backend completa se cerrará cuando existan los módulos de
+transacciones y estado de cuenta.

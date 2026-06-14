@@ -5,7 +5,7 @@
 | HU-001 | Project foundation | DONE |
 | HU-002 | Spring Boot bootstrap | DONE |
 | HU-003 | Customer CRUD | DONE |
-| HU-004 | Account management | IN PROGRESS |
+| HU-004 | Account management | DONE |
 | HU-005 | Financial transactions | PENDING |
 | HU-006 | Account statement | PENDING |
 | HU-007 | Tests and docs | PENDING |
@@ -84,9 +84,9 @@ feat(customers): implement customer CRUD
 
 ### Estado
 
-PLAN UPDATED - PENDING APPROVAL
+DONE
 
-### Actividad actual
+### Implementación
 
 - Se resolvieron documentalmente los hallazgos P0, P1 y P2 de la auditoría.
 - Se definió que `SAVINGS` y `CHECKING` se crean en estado `ACTIVE`, indicando
@@ -97,8 +97,32 @@ PLAN UPDATED - PENDING APPROVAL
 - Se validaron V1 y V2 sobre PostgreSQL real.
 - Se confirmó que la tabla `accounts` ya tiene las columnas, constraints e
   índice requeridos, por lo que no se justifica una migración V3.
+- Se implementaron creación, consultas, listado paginado y filtrado.
+- Se implementaron activación, inactivación y cancelación lógica.
+- Se mantuvieron fuera de alcance transacciones, movimientos y frontend.
 
-### Gate
+### Endpoints
 
-No se ha iniciado implementación funcional. HU-004 permanece pendiente de
-aprobación explícita antes de crear clases Java o pruebas.
+```text
+POST  /api/v1/accounts
+GET   /api/v1/accounts
+GET   /api/v1/accounts/{id}
+GET   /api/v1/accounts/number/{accountNumber}
+PATCH /api/v1/accounts/{id}/status
+PATCH /api/v1/accounts/{id}/cancel
+```
+
+### Pruebas
+
+- Pruebas unitarias de `AccountService`.
+- Pruebas MockMvc de `AccountController`.
+- Cobertura de tipos, prefijos, saldos, GMF, estados, cancelación, filtros y
+  errores controlados.
+- Cobertura de rechazo de saldos negativos en la frontera de entidad.
+- Cobertura de filtros `accountType` y `status` inválidos con respuesta `400`.
+
+### Commit esperado
+
+```text
+feat(accounts): implement account management
+```

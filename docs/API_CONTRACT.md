@@ -103,7 +103,7 @@ DELETE /api/v1/customers/{id}
 POST /api/v1/accounts
 ```
 
-Entrada prevista:
+Entrada:
 
 ```json
 {
@@ -145,6 +145,16 @@ GET /api/v1/accounts/{id}
 
 - `200 OK`: cuenta encontrada.
 - `404 Not Found`: cuenta inexistente.
+
+### Consultar cuenta por número
+
+```http
+GET /api/v1/accounts/number/{accountNumber}
+```
+
+- `200 OK`: cuenta encontrada.
+- `400 Bad Request`: el número no contiene exactamente 10 dígitos.
+- `404 Not Found`: número de cuenta inexistente.
 
 ### Cambiar estado
 
