@@ -2,11 +2,11 @@
 
 ## Estado
 
-PLAN UPDATED - PENDING REAPPROVAL
+APPROVED - IMPLEMENTED
 
-Este documento define la implementación de consignaciones, retiros y
-transferencias. Incorpora los ajustes P1 y P2 de la segunda auditoría. No
-autoriza todavía la creación de código funcional de HU-005.
+Este documento definió la implementación de consignaciones, retiros y
+transferencias e incorporó los ajustes P1 y P2 de la segunda auditoría. El plan
+fue aprobado antes de iniciar el código funcional de HU-005.
 
 ## Objetivo
 
@@ -388,7 +388,8 @@ La migración deberá:
 `transactionDate` será la fecha efectiva de la operación financiera y
 `createdAt` conservará la fecha de creación técnica del registro.
 
-La migración V3 no se crea durante esta fase documental.
+La migración V3 fue creada durante la implementación y validada sobre
+PostgreSQL 17 limpio, además de ejecutarse en las pruebas con Flyway.
 
 ## Estrategia de implementación
 
@@ -506,5 +507,5 @@ feat(transactions): implement financial transactions
 
 ## Gate de aprobación
 
-No se crearán entidades, repositorios, DTOs, servicios, controladores ni pruebas
-de HU-005 hasta recibir aprobación explícita de este plan.
+La aprobación explícita fue recibida antes de crear entidades, repositorios,
+DTOs, servicios, controladores y pruebas de HU-005.

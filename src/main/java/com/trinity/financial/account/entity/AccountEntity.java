@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "accounts")
@@ -28,6 +30,7 @@ public class AccountEntity {
             unique = true,
             length = 10,
             columnDefinition = "char(10)")
+    @JdbcTypeCode(SqlTypes.CHAR)
     private String accountNumber;
 
     @Enumerated(EnumType.STRING)
@@ -88,12 +91,37 @@ public class AccountEntity {
         this.updatedAt = Objects.requireNonNull(updatedAt);
     }
 
+    public void credit(BigDecimal amount, LocalDateTime updatedAt) {
+        requirePositive(amount);
+        this.balance = this.balance.add(amount);
+        this.availableBalance = this.availableBalance.add(amount);
+        this.updatedAt = Objects.requireNonNull(updatedAt);
+    }
+
+    public void debit(BigDecimal amount, LocalDateTime updatedAt) {
+        requirePositive(amount);
+        if (this.availableBalance.compareTo(amount) < 0
+                || this.balance.compareTo(amount) < 0) {
+            throw new IllegalArgumentException("insufficient funds");
+        }
+        this.balance = this.balance.subtract(amount);
+        this.availableBalance = this.availableBalance.subtract(amount);
+        this.updatedAt = Objects.requireNonNull(updatedAt);
+    }
+
     private static BigDecimal requireNonNegative(BigDecimal value, String field) {
         Objects.requireNonNull(value, field + " is required");
         if (value.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException(field + " cannot be negative");
         }
         return value;
+    }
+
+    private static void requirePositive(BigDecimal amount) {
+        Objects.requireNonNull(amount, "amount is required");
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("amount must be positive");
+        }
     }
 
     public UUID getId() {

@@ -6,7 +6,7 @@
 | HU-002 | Spring Boot bootstrap | DONE |
 | HU-003 | Customer CRUD | DONE |
 | HU-004 | Account management | DONE |
-| HU-005 | Financial transactions | IN PROGRESS |
+| HU-005 | Financial transactions | DONE |
 | HU-006 | Account statement | PENDING |
 | HU-007 | Tests and docs | PENDING |
 | HU-008 | Frontend demo | PENDING |
@@ -131,7 +131,7 @@ feat(accounts): implement account management
 
 ### Estado
 
-PLAN READY - PENDING APPROVAL
+DONE
 
 ### Actividad actual
 
@@ -149,5 +149,26 @@ PLAN READY - PENDING APPROVAL
 
 ### Gate
 
-No se ha iniciado implementación funcional. HU-005 permanece pendiente de
-aprobación explícita del plan.
+El plan fue aprobado antes de implementar.
+
+### Implementación
+
+- Se creó y validó V3 sobre PostgreSQL 17 limpio.
+- Se implementaron consignaciones, retiros, transferencias y consulta por UUID.
+- Se actualizaron conjuntamente `balance` y `availableBalance`.
+- Se persistieron transacciones exitosas y movimientos contables.
+- Se añadieron bloqueos pesimistas y orden lexicográfico para transferencias.
+- Se mantuvo HU-006 fuera de alcance.
+
+### Pruebas
+
+- Pruebas unitarias de `TransactionService`.
+- Pruebas MockMvc de `TransactionController`.
+- Prueba de integración obligatoria de rollback.
+- Validación de escala decimal, estados, fondos, movimientos y relaciones.
+
+### Commit esperado
+
+```text
+feat(transactions): implement financial transactions
+```

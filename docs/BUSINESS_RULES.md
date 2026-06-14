@@ -66,6 +66,15 @@
     `CREDIT` en el destino.
 14. Una consignación genera un movimiento `CREDIT`.
 15. Un retiro genera un movimiento `DEBIT`.
+16. Las cuentas se bloquean con escritura pesimista antes de validar y cambiar
+    saldos.
+17. Una transferencia bloquea ambas cuentas en orden lexicográfico ascendente
+    por número.
+18. Solo se persisten transacciones exitosas.
+19. Saldos, transacción y movimientos pertenecen a una única transacción de
+    base de datos.
+20. `transactionDate` registra la fecha efectiva de la operación y `createdAt`
+    la fecha técnica de creación.
 
 ## FinancialTransaction
 

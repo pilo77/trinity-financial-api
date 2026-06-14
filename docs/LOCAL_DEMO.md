@@ -2,9 +2,8 @@
 
 ## Estado
 
-La infraestructura local, el CRUD de clientes y la administración de cuentas
-pueden ejecutarse y validarse. Las transacciones financieras y el estado de
-cuenta todavía no están implementados.
+La infraestructura local, clientes, cuentas y transacciones financieras pueden
+ejecutarse y validarse. El estado de cuenta todavía no está implementado.
 
 ## Prerrequisitos
 
@@ -53,8 +52,12 @@ Los valores reales no deben aparecer en documentación, commits, logs o capturas
 11. Inactivar y volver a activar una cuenta.
 12. Cancelar una cuenta con ambos saldos en cero y comprobar que no se reactive.
 13. Intentar eliminar un cliente con cuentas y verificar el rechazo.
-14. Realizar consignación, retiro y transferencia cuando HU-005 esté lista.
-15. Consultar el estado de cuenta cuando HU-006 esté lista.
+14. Realizar una consignación y verificar ambos saldos y el movimiento crédito.
+15. Realizar un retiro y verificar ambos saldos y el movimiento débito.
+16. Transferir entre cuentas y verificar los movimientos débito y crédito.
+17. Intentar retirar sin fondos y operar una cuenta no activa.
+18. Consultar una transacción por UUID.
+19. Consultar el estado de cuenta cuando HU-006 esté lista.
 
 ## Validaciones esperadas
 
@@ -84,5 +87,4 @@ GET http://localhost:8080/v3/api-docs
 GET http://localhost:8080/swagger-ui.html
 ```
 
-La demostración backend completa se cerrará cuando existan los módulos de
-transacciones y estado de cuenta.
+La demostración backend completa se cerrará cuando exista el estado de cuenta.

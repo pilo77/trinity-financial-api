@@ -207,13 +207,14 @@ GET /api/v1/accounts/number/{accountNumber}/statement?from={dateTime}&to={dateTi
 ### Consignar
 
 ```http
-POST /api/v1/accounts/{id}/deposits
+POST /api/v1/transactions/deposits
 ```
 
-Entrada prevista:
+Entrada:
 
 ```json
 {
+  "accountNumber": "5300000001",
   "amount": 100000.00,
   "description": "Consignación"
 }
@@ -227,8 +228,11 @@ Entrada prevista:
 ### Retirar
 
 ```http
-POST /api/v1/accounts/{id}/withdrawals
+POST /api/v1/transactions/withdrawals
 ```
+
+El cuerpo usa `accountNumber`, `amount` y `description` con las mismas
+validaciones de la consignación.
 
 - `201 Created`: transacción y movimiento débito creados.
 - `400 Bad Request`: importe inválido.
@@ -238,10 +242,10 @@ POST /api/v1/accounts/{id}/withdrawals
 ### Transferir
 
 ```http
-POST /api/v1/transfers
+POST /api/v1/transactions/transfers
 ```
 
-Entrada prevista:
+Entrada:
 
 ```json
 {
@@ -268,6 +272,13 @@ GET /api/v1/transactions/{id}
 
 - `200 OK`: transacción encontrada.
 - `404 Not Found`: transacción inexistente.
+
+Los tres requests validan `amount` con `@NotNull`, `@Positive` y
+`@Digits(integer = 17, fraction = 2)`. Una escala mayor a dos decimales produce
+`400 Bad Request`.
+
+La respuesta incluye datos de la transacción y sus movimientos mínimos. Estos
+movimientos son detalle de la operación y no constituyen el estado de cuenta.
 
 ## Formato de errores
 
