@@ -8,9 +8,12 @@
 | HU-004 | Account management | DONE |
 | HU-005 | Financial transactions | DONE |
 | HU-006 | Account statement | DONE |
-| HU-007 | Tests and docs | IN PROGRESS |
-| HU-008 | Frontend demo | PENDING |
-| HU-009 | Cloud deploy | PENDING |
+| HU-007 | Tests and docs | DONE |
+| HU-008 | Angular frontend demo | IN REVIEW |
+| HU-009 | Cloud deployment readiness | IN REVIEW |
+
+`HU-009` cubre configuracion y documentacion para despliegue. El despliegue
+publico en Vercel y Render/Railway sigue pendiente de autorizacion.
 
 ## HU-003 - Customer CRUD
 
