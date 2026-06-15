@@ -97,6 +97,10 @@ export class FinancialApiService {
     return this.http.post<Transaction>(`${this.baseUrl}/transactions/transfers`, payload);
   }
 
+  getTransactionById(id: string): Observable<Transaction> {
+    return this.http.get<Transaction>(`${this.baseUrl}/transactions/${id}`);
+  }
+
   getStatement(
     accountNumber: string,
     startDate?: string,

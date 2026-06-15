@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 
 import { FinancialApiService } from '../../core/financial-api.service';
+import { dateRangeValidator } from '../../core/financial-validators';
 import { Account, AccountStatement } from '../../core/models';
 
 @Component({
@@ -36,6 +37,9 @@ import { Account, AccountStatement } from '../../core/models';
         <label>Hasta
           <input type="datetime-local" formControlName="endDate" />
         </label>
+        @if (form.hasError('invalidDateRange')) {
+          <small class="field-error form-error">La fecha inicial no puede ser posterior a la fecha final.</small>
+        }
         <button class="button primary" type="submit" [disabled]="form.invalid || loading()">
           {{ loading() ? 'Consultando...' : 'Generar estado' }}
         </button>
@@ -101,11 +105,14 @@ export class Statements {
   protected readonly statement = signal<AccountStatement | null>(null);
   protected readonly loading = signal(false);
   protected readonly error = signal('');
-  protected readonly form = this.fb.nonNullable.group({
-    accountNumber: ['', Validators.required],
-    startDate: [''],
-    endDate: [''],
-  });
+  protected readonly form = this.fb.nonNullable.group(
+    {
+      accountNumber: ['', Validators.required],
+      startDate: [''],
+      endDate: [''],
+    },
+    { validators: dateRangeValidator },
+  );
 
   constructor() {
     this.api.getAccounts().subscribe({
@@ -115,7 +122,10 @@ export class Statements {
   }
 
   protected search(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     const value = this.form.getRawValue();
     this.loading.set(true);
     this.error.set('');

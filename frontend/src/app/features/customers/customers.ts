@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 
 import { FinancialApiService } from '../../core/financial-api.service';
+import { minimumAgeValidator } from '../../core/financial-validators';
 import { Customer, CustomerRequest } from '../../core/models';
 
 @Component({
@@ -107,6 +108,9 @@ import { Customer, CustomerRequest } from '../../core/models';
               </label>
               <label>Fecha de nacimiento
                 <input formControlName="birthDate" type="date" />
+                @if ((form.controls.birthDate.dirty || form.controls.birthDate.touched) && form.controls.birthDate.hasError('minimumAge')) {
+                  <small class="field-error">El cliente debe tener al menos 18 anos.</small>
+                }
               </label>
             </div>
             <div class="modal-actions">
@@ -142,7 +146,7 @@ export class Customers {
     lastName: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
     phone: [''],
-    birthDate: ['', Validators.required],
+    birthDate: ['', [Validators.required, minimumAgeValidator(18)]],
   });
 
   constructor() {
@@ -184,7 +188,10 @@ export class Customers {
   }
 
   protected save(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     this.saving.set(true);
     this.error.set('');
     const payload = this.form.getRawValue() as CustomerRequest;
