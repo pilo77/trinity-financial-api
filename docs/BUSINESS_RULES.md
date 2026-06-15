@@ -16,16 +16,29 @@
 1. Una cuenta pertenece a un único cliente existente.
 2. Los tipos permitidos son `SAVINGS` y `CHECKING`.
 3. Los estados permitidos son `ACTIVE`, `INACTIVE` y `CANCELLED`.
-4. Toda cuenta nueva inicia con `balance` y `availableBalance` en cero.
-5. Una cuenta de ahorro debe crearse en estado `ACTIVE`.
-6. El número de cuenta se genera automáticamente y es único.
-7. El número de cuenta tiene exactamente 10 dígitos.
-8. Las cuentas `SAVINGS` comienzan por `53`.
-9. Las cuentas `CHECKING` comienzan por `33`.
-10. `gmfExempt` es un atributo obligatorio de tipo booleano.
-11. Una cuenta cancelada no puede recibir nuevas transacciones.
-12. Una cuenta solo puede cancelarse cuando su saldo sea exactamente cero.
-13. La cancelación cambia el estado a `CANCELLED`; no elimina la cuenta.
+4. `balance` y `availableBalance` son campos independientes de tipo
+   `BigDecimal`.
+5. Toda cuenta nueva inicia ambos saldos con `BigDecimal.ZERO`.
+6. HU-004 no modifica saldos mediante operaciones financieras.
+7. Una cuenta `SAVINGS` se crea en estado `ACTIVE` por requisito del enunciado.
+8. Una cuenta `CHECKING` se crea en estado `ACTIVE` por decisión del MVP, para
+   permitir administración inmediata y una demo consistente.
+9. El número de cuenta se genera automáticamente y es único.
+10. El número de cuenta tiene exactamente 10 dígitos.
+11. Las cuentas `SAVINGS` comienzan por `53`.
+12. Las cuentas `CHECKING` comienzan por `33`.
+13. La generación permite como máximo 5 intentos; si se agotan, se produce una
+    excepción de negocio controlada.
+14. `gmfExempt` es un booleano no nulo en el dominio. En la solicitud de
+    creación es opcional y toma `false` por defecto.
+15. El cambio de estado operativo solo permite `ACTIVE` o `INACTIVE`.
+16. Una cuenta cancelada no puede reactivarse ni recibir nuevas transacciones.
+17. La cancelación usa una operación separada y solo se permite cuando
+    `balance` y `availableBalance` son ambos exactamente cero.
+18. La cancelación cambia el estado a `CANCELLED`; no elimina la cuenta.
+19. Ninguna cuenta, incluida una cuenta `SAVINGS`, puede persistir `balance` o
+    `availableBalance` negativos. La entidad y los constraints de base de datos
+    protegen esta regla.
 
 ## Valores monetarios
 
@@ -53,6 +66,15 @@
     `CREDIT` en el destino.
 14. Una consignación genera un movimiento `CREDIT`.
 15. Un retiro genera un movimiento `DEBIT`.
+16. Las cuentas se bloquean con escritura pesimista antes de validar y cambiar
+    saldos.
+17. Una transferencia bloquea ambas cuentas en orden lexicográfico ascendente
+    por número.
+18. Solo se persisten transacciones exitosas.
+19. Saldos, transacción y movimientos pertenecen a una única transacción de
+    base de datos.
+20. `transactionDate` registra la fecha efectiva de la operación y `createdAt`
+    la fecha técnica de creación.
 
 ## FinancialTransaction
 

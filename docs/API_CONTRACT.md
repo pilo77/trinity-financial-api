@@ -11,10 +11,17 @@
 - Fechas y horas: formato ISO 8601
 - Listados: paginados cuando aplique
 
-Los DTO definitivos y ejemplos OpenAPI se concretarán durante la implementación.
-Las entidades JPA no se expondrán directamente.
+Las entidades JPA no se exponen directamente.
 
 ## Clientes
+
+Resumen de endpoints:
+
+- `POST /api/v1/customers`
+- `GET /api/v1/customers`
+- `GET /api/v1/customers/{id}`
+- `PUT /api/v1/customers/{id}`
+- `DELETE /api/v1/customers/{id}`
 
 ### Crear cliente
 
@@ -22,8 +29,19 @@ Las entidades JPA no se expondrán directamente.
 POST /api/v1/customers
 ```
 
-Entrada prevista: documento, nombres, apellidos, correo, teléfono y fecha de
-nacimiento.
+Entrada:
+
+```json
+{
+  "documentType": "CC",
+  "documentNumber": "123456789",
+  "firstName": "Carlos",
+  "lastName": "Villamil",
+  "email": "carlos@example.com",
+  "phone": "3000000000",
+  "birthDate": "1990-01-01"
+}
+```
 
 Respuestas:
 
@@ -38,6 +56,19 @@ GET /api/v1/customers?page=0&size=20
 ```
 
 - `200 OK`: página de clientes.
+
+La respuesta paginada contiene:
+
+```json
+{
+  "content": [],
+  "page": 0,
+  "size": 20,
+  "totalElements": 0,
+  "totalPages": 0,
+  "last": true
+}
+```
 
 ### Consultar cliente
 
@@ -55,6 +86,7 @@ PUT /api/v1/customers/{id}
 ```
 
 La actualización vuelve a validar mayoría de edad, documento y correo.
+El cuerpo utiliza los mismos campos obligatorios de la creación.
 
 - `200 OK`: cliente actualizado.
 - `400 Bad Request`: datos inválidos o menor de edad.
@@ -73,13 +105,23 @@ DELETE /api/v1/customers/{id}
 
 ## Cuentas
 
+Resumen de endpoints:
+
+- `POST /api/v1/accounts`
+- `GET /api/v1/accounts`
+- `GET /api/v1/accounts/{id}`
+- `GET /api/v1/accounts/number/{accountNumber}`
+- `PATCH /api/v1/accounts/{id}/status`
+- `PATCH /api/v1/accounts/{id}/cancel`
+- `GET /api/v1/accounts/number/{accountNumber}/statement`
+
 ### Crear cuenta
 
 ```http
 POST /api/v1/accounts
 ```
 
-Entrada prevista:
+Entrada:
 
 ```json
 {
@@ -89,19 +131,29 @@ Entrada prevista:
 }
 ```
 
-El número, estado, saldo y saldo disponible son asignados por el sistema.
+`gmfExempt` es opcional y toma `false` por defecto cuando no se envía.
+
+El número y el estado son asignados por el sistema. Tanto `SAVINGS` como
+`CHECKING` se crean en estado `ACTIVE`; para `SAVINGS` es un requisito del
+enunciado y para `CHECKING` es una decisión documentada del MVP.
+
+`balance` y `availableBalance` se inicializan con `BigDecimal.ZERO` y no pueden
+ser proporcionados por el consumidor.
 
 - `201 Created`: cuenta creada.
-- `400 Bad Request`: solicitud inválida.
+- `400 Bad Request`: solicitud inválida. Un `accountType` desconocido debe
+  producir un mensaje claro y nunca un error `500`.
 - `404 Not Found`: cliente inexistente.
+- `409 Conflict`: no fue posible generar un número único después de 5 intentos.
 
 ### Listar cuentas
 
 ```http
-GET /api/v1/accounts?customerId={customerId}&status=ACTIVE&page=0&size=20
+GET /api/v1/accounts?customerId={customerId}&accountType=SAVINGS&status=ACTIVE&page=0&size=20&sort=createdAt,desc
 ```
 
 - `200 OK`: página de cuentas.
+- `400 Bad Request`: filtros, paginación u ordenamiento inválidos.
 
 ### Consultar cuenta
 
@@ -112,18 +164,37 @@ GET /api/v1/accounts/{id}
 - `200 OK`: cuenta encontrada.
 - `404 Not Found`: cuenta inexistente.
 
+### Consultar cuenta por número
+
+```http
+GET /api/v1/accounts/number/{accountNumber}
+```
+
+- `200 OK`: cuenta encontrada.
+- `400 Bad Request`: el número no contiene exactamente 10 dígitos.
+- `404 Not Found`: número de cuenta inexistente.
+
 ### Cambiar estado
 
 ```http
 PATCH /api/v1/accounts/{id}/status
 ```
 
-Permitirá transiciones entre `ACTIVE` e `INACTIVE`. La cancelación tiene una
-operación independiente.
+Entrada prevista:
+
+```json
+{
+  "status": "INACTIVE"
+}
+```
+
+Solo permite `ACTIVE` o `INACTIVE`. No permite enviar `CANCELLED` ni reactivar
+una cuenta cancelada. La cancelación tiene una operación independiente.
 
 - `200 OK`: estado actualizado.
-- `400 Bad Request`: transición inválida.
+- `400 Bad Request`: estado solicitado inválido.
 - `404 Not Found`: cuenta inexistente.
+- `409 Conflict`: transición no permitida por el estado actual.
 
 ### Cancelar cuenta
 
@@ -131,32 +202,52 @@ operación independiente.
 PATCH /api/v1/accounts/{id}/cancel
 ```
 
+La cancelación requiere que `balance` y `availableBalance` sean ambos
+exactamente cero.
+
 - `200 OK`: cuenta marcada como `CANCELLED`.
 - `404 Not Found`: cuenta inexistente.
-- `409 Conflict`: saldo diferente de cero o cuenta ya cancelada.
+- `409 Conflict`: alguno de los saldos es diferente de cero o la cuenta ya está
+  cancelada.
 
 ### Consultar estado de cuenta
 
 ```http
-GET /api/v1/accounts/number/{accountNumber}/statement?from={dateTime}&to={dateTime}&page=0&size=20
+GET /api/v1/accounts/number/{accountNumber}/statement?startDate={dateTime}&endDate={dateTime}&page=0&size=20&sort=createdAt,desc
 ```
 
-- `200 OK`: movimientos construidos desde `AccountMovement`.
-- `400 Bad Request`: rango de fechas inválido.
+- `200 OK`: estado de cuenta con balance actual, availableBalance actual,
+  movimientos `DEBIT`/`CREDIT` y metadatos de paginación.
+- `400 Bad Request`: número de cuenta inválido o rango de fechas inválido.
 - `404 Not Found`: número de cuenta inexistente.
 
+La respuesta del estado de cuenta incluye:
+
+- Información básica de la cuenta (`accountNumber`, `accountType`, `status`).
+- Saldos actuales (`balance`, `availableBalance`).
+- Lista paginada de movimientos construida desde `AccountMovement`.
+- Fecha de generación del statement.
+
 ## Transacciones
+
+Resumen de endpoints:
+
+- `POST /api/v1/transactions/deposits`
+- `POST /api/v1/transactions/withdrawals`
+- `POST /api/v1/transactions/transfers`
+- `GET /api/v1/transactions/{id}`
 
 ### Consignar
 
 ```http
-POST /api/v1/accounts/{id}/deposits
+POST /api/v1/transactions/deposits
 ```
 
-Entrada prevista:
+Entrada:
 
 ```json
 {
+  "accountNumber": "5300000001",
   "amount": 100000.00,
   "description": "Consignación"
 }
@@ -170,8 +261,11 @@ Entrada prevista:
 ### Retirar
 
 ```http
-POST /api/v1/accounts/{id}/withdrawals
+POST /api/v1/transactions/withdrawals
 ```
+
+El cuerpo usa `accountNumber`, `amount` y `description` con las mismas
+validaciones de la consignación.
 
 - `201 Created`: transacción y movimiento débito creados.
 - `400 Bad Request`: importe inválido.
@@ -181,10 +275,10 @@ POST /api/v1/accounts/{id}/withdrawals
 ### Transferir
 
 ```http
-POST /api/v1/transfers
+POST /api/v1/transactions/transfers
 ```
 
-Entrada prevista:
+Entrada:
 
 ```json
 {
@@ -211,6 +305,13 @@ GET /api/v1/transactions/{id}
 
 - `200 OK`: transacción encontrada.
 - `404 Not Found`: transacción inexistente.
+
+Los tres requests validan `amount` con `@NotNull`, `@Positive` y
+`@Digits(integer = 17, fraction = 2)`. Una escala mayor a dos decimales produce
+`400 Bad Request`.
+
+La respuesta incluye datos de la transacción y sus movimientos mínimos. Estos
+movimientos son detalle de la operación y no constituyen el estado de cuenta.
 
 ## Formato de errores
 
