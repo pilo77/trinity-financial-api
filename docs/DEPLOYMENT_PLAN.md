@@ -43,3 +43,24 @@ PostgreSQL administrado
 - Imagen Docker construida y ejecutada localmente.
 - No hay `.env`, secretos, `target`, `dist` ni `node_modules` versionados.
 - No se inicia despliegue real sin autorizacion.
+
+## Riesgo aceptado de dependencias de desarrollo
+
+La auditoria de dependencias debe evaluarse con ambos comandos:
+
+```powershell
+npm audit --omit=dev
+npm audit
+```
+
+Un resultado limpio en `--omit=dev` confirma que el bundle productivo no tiene
+vulnerabilidades conocidas en dependencias de runtime. Los avisos que permanezcan
+exclusivamente en Angular CLI, Vite, esbuild u otras herramientas de build se
+documentan como riesgo de desarrollo y se actualizan cuando exista una version
+compatible, sin usar `npm audit fix --force`.
+
+## Calidad frontend pendiente
+
+El proyecto no incorpora ESLint actualmente. Agregarlo requiere dependencias y
+configuracion adicionales; se mantiene como mejora P2 no bloqueante mientras
+TypeScript, Angular build y la suite de pruebas finalicen correctamente.

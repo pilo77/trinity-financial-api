@@ -3,7 +3,12 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 
+import { ApiError } from '../../core/api-error.interceptor';
 import { FinancialApiService } from '../../core/financial-api.service';
+import {
+  distinctAccountsValidator,
+  positiveAmountValidator,
+} from '../../core/financial-validators';
 import { Account, Transaction, TransactionType } from '../../core/models';
 
 @Component({
@@ -51,6 +56,9 @@ import { Account, Transaction, TransactionType } from '../../core/models';
                   }
                 </select>
               </label>
+              @if (form.hasError('sameAccount')) {
+                <small class="field-error">La cuenta destino debe ser diferente de la cuenta origen.</small>
+              }
             }
 
             <label>Monto
@@ -58,6 +66,9 @@ import { Account, Transaction, TransactionType } from '../../core/models';
                 <span>$</span>
                 <input formControlName="amount" type="number" min="0.01" step="0.01" placeholder="0.00" />
               </div>
+              @if ((form.controls.amount.dirty || form.controls.amount.touched) && form.controls.amount.invalid) {
+                <small class="field-error">El monto debe ser mayor que cero.</small>
+              }
             </label>
             <label>Descripcion
               <textarea formControlName="description" maxlength="255" rows="3" placeholder="Concepto de la operacion"></textarea>
@@ -91,6 +102,35 @@ import { Account, Transaction, TransactionType } from '../../core/models';
         }
       </aside>
     </div>
+
+    <article class="panel transaction-search">
+      <div>
+        <span class="eyebrow">Trazabilidad</span>
+        <h2>Consultar transaccion por ID</h2>
+        <p class="muted">Busca una operacion registrada usando su identificador UUID.</p>
+      </div>
+      <form [formGroup]="searchForm" (ngSubmit)="searchTransaction()">
+        <label>ID de transaccion
+          <input formControlName="transactionId" placeholder="00000000-0000-0000-0000-000000000000" />
+          @if ((searchForm.controls.transactionId.dirty || searchForm.controls.transactionId.touched) && searchForm.controls.transactionId.invalid) {
+            <small class="field-error">Ingresa un UUID valido.</small>
+          }
+        </label>
+        <button class="button primary" type="submit" [disabled]="searchForm.invalid || searching()">
+          {{ searching() ? 'Buscando...' : 'Buscar transaccion' }}
+        </button>
+      </form>
+      @if (searchError()) { <div class="alert error">{{ searchError() }}</div> }
+      @if (searchedTransaction(); as transaction) {
+        <div class="transaction-result">
+          <span class="status active">{{ transaction.status }}</span>
+          <strong>{{ transaction.transactionType }}</strong>
+          <span class="mono">{{ transaction.id }}</span>
+          <span>{{ transaction.amount | currency: 'COP' : 'symbol-narrow' : '1.0-2' }}</span>
+          <time>{{ transaction.transactionDate | date: 'medium' }}</time>
+        </div>
+      }
+    </article>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -104,11 +144,28 @@ export class Transactions {
   protected readonly message = signal('');
   protected readonly error = signal('');
   protected readonly lastTransaction = signal<Transaction | null>(null);
-  protected readonly form = this.fb.nonNullable.group({
-    sourceAccountNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-    destinationAccountNumber: [''],
-    amount: [0, [Validators.required, Validators.min(0.01)]],
-    description: ['', Validators.maxLength(255)],
+  protected readonly searching = signal(false);
+  protected readonly searchError = signal('');
+  protected readonly searchedTransaction = signal<Transaction | null>(null);
+  protected readonly form = this.fb.nonNullable.group(
+    {
+      sourceAccountNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      destinationAccountNumber: [''],
+      amount: [0, [Validators.required, positiveAmountValidator]],
+      description: ['', Validators.maxLength(255)],
+    },
+    { validators: distinctAccountsValidator },
+  );
+  protected readonly searchForm = this.fb.nonNullable.group({
+    transactionId: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+        ),
+      ],
+    ],
   });
 
   constructor() {
@@ -145,7 +202,10 @@ export class Transactions {
   }
 
   protected submit(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     const value = this.form.getRawValue();
     this.saving.set(true);
     this.error.set('');
@@ -180,5 +240,28 @@ export class Transactions {
       },
       error: (error: Error) => this.error.set(error.message),
     });
+  }
+
+  protected searchTransaction(): void {
+    if (this.searchForm.invalid) {
+      this.searchForm.markAllAsTouched();
+      return;
+    }
+
+    this.searching.set(true);
+    this.searchError.set('');
+    this.searchedTransaction.set(null);
+    this.api
+      .getTransactionById(this.searchForm.controls.transactionId.value)
+      .pipe(finalize(() => this.searching.set(false)))
+      .subscribe({
+        next: (transaction) => this.searchedTransaction.set(transaction),
+        error: (error: Error) =>
+          this.searchError.set(
+            error instanceof ApiError && error.status === 404
+              ? 'No se encontro una transaccion con ese identificador.'
+              : error.message,
+          ),
+      });
   }
 }

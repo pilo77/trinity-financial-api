@@ -2,14 +2,15 @@
   color-scheme: light;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-synthesis: none;
-  --ink: #173b3e;
-  --muted: #6f8581;
-  --line: #dce7e4;
+  --ink: #2b2140;
+  --muted: #766d88;
+  --line: #e5dff0;
   --surface: #ffffff;
-  --canvas: #f4f8f7;
-  --primary: #0b8f76;
-  --primary-dark: #076b5a;
-  --danger: #b64242;
+  --canvas: #f8f6fc;
+  --primary: #7650c7;
+  --primary-dark: #5935a3;
+  --accent: #d84f9b;
+  --danger: #b23b62;
 }
 
 * {
@@ -151,14 +152,14 @@ h2 {
 }
 
 .metric-card.featured {
-  background: linear-gradient(135deg, #0b735f, #0a9b7f);
+  background: linear-gradient(135deg, #5935a3, #9b58d3 65%, #d84f9b);
   border-color: transparent;
   color: white;
 }
 
 .metric-card.featured span,
 .metric-card.featured small {
-  color: #c9f3e9;
+  color: #f1e8ff;
 }
 
 .panel {
@@ -245,8 +246,8 @@ tbody tr:last-child td {
 
 .status.active,
 .movement.credit {
-  background: #dff6ee;
-  color: #08705c;
+  background: #eee7ff;
+  color: #6540b2;
 }
 
 .status.inactive {
@@ -260,7 +261,7 @@ tbody tr:last-child td {
 }
 
 .positive {
-  color: #08705c;
+  color: #6540b2;
   font-weight: 700;
 }
 
@@ -299,9 +300,9 @@ tbody tr:last-child td {
 
 .avatar {
   align-items: center;
-  background: #e2f4ef;
+  background: #eee7ff;
   border-radius: 50%;
-  color: #08705c;
+  color: #6540b2;
   display: flex;
   font-size: 0.7rem;
   font-weight: 800;
@@ -419,7 +420,7 @@ tbody tr:last-child td {
 }
 
 label {
-  color: #45615d;
+  color: #554a68;
   display: grid;
   font-size: 0.75rem;
   font-weight: 700;
@@ -441,7 +442,18 @@ label input:focus,
 label select:focus,
 label textarea:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(11, 143, 118, 0.1);
+  box-shadow: 0 0 0 3px rgba(118, 80, 199, 0.12);
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+
+.form-error {
+  align-self: center;
+  grid-column: 1 / -1;
 }
 
 label.check {
@@ -462,7 +474,7 @@ label.check input {
 }
 
 .operation-tabs {
-  background: #edf4f2;
+  background: #f0ebf8;
   border-radius: 10px;
   display: grid;
   gap: 0.3rem;
@@ -484,7 +496,7 @@ label.check input {
 
 .operation-tabs button.active {
   background: white;
-  box-shadow: 0 2px 8px rgba(14, 55, 57, 0.08);
+  box-shadow: 0 2px 8px rgba(74, 48, 116, 0.1);
   color: var(--primary);
 }
 
@@ -549,6 +561,30 @@ dd {
   margin: 1rem 0 0.4rem;
 }
 
+.transaction-search {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.3rem;
+}
+
+.transaction-search form {
+  align-items: end;
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.transaction-result {
+  align-items: center;
+  background: #f7f3fd;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+  padding: 0.9rem;
+}
+
 .statement-search form {
   align-items: end;
   display: grid;
@@ -586,6 +622,10 @@ dd {
   .statement-search form {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .transaction-result {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 650px) {
@@ -599,6 +639,11 @@ dd {
   .settings-grid,
   .form-grid,
   .statement-search form {
+    grid-template-columns: 1fr;
+  }
+
+  .transaction-search form,
+  .transaction-result {
     grid-template-columns: 1fr;
   }
 
