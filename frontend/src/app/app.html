@@ -1,0 +1,52 @@
+<div class="app-shell">
+  <aside class="sidebar" [class.sidebar-open]="menuOpen()">
+    <a class="brand" routerLink="/dashboard" (click)="closeMenu()">
+      <span class="brand-mark">TF</span>
+      <span>
+        <strong>Trinity</strong>
+        <small>Financial</small>
+      </span>
+    </a>
+
+    <nav aria-label="Navegacion principal">
+      @for (item of navigation; track item.path) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          (click)="closeMenu()"
+        >
+          <span class="nav-icon" aria-hidden="true">{{ item.icon }}</span>
+          {{ item.label }}
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="status-dot"></span>
+      <div>
+        <strong>API financiera</strong>
+        <small>Entorno {{ environmentName }}</small>
+      </div>
+    </div>
+  </aside>
+
+  @if (menuOpen()) {
+    <button class="backdrop" aria-label="Cerrar menu" (click)="closeMenu()"></button>
+  }
+
+  <main>
+    <header class="topbar">
+      <button class="menu-button" type="button" aria-label="Abrir menu" (click)="toggleMenu()">
+        ☰
+      </button>
+      <div>
+        <p>Gestion financiera</p>
+        <strong>{{ today | date: 'EEEE, d MMMM' }}</strong>
+      </div>
+      <span class="environment-badge">{{ environmentName }}</span>
+    </header>
+    <section class="page-container">
+      <router-outlet />
+    </section>
+  </main>
+</div>

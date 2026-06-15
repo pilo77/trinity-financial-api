@@ -18,6 +18,7 @@ Módulos implementados:
 - Cuentas de ahorro y cuentas corrientes.
 - Transacciones financieras.
 - Consulta de estado de cuenta.
+- Frontend Angular financiero para demostración profesional.
 
 ## Alcance MVP
 
@@ -36,8 +37,8 @@ Módulos implementados:
 No forman parte del MVP backend obligatorio: microservicios, autenticación JWT,
 créditos, intereses, comisiones, sobregiros e integraciones externas.
 
-El frontend podrá agregarse posteriormente como demo profesional, sin reemplazar
-el foco principal de la prueba técnica backend.
+El frontend de demostración se encuentra en `frontend/`. Mantiene el foco
+principal de la prueba en el backend y consume exclusivamente el contrato REST.
 
 El despliegue cloud también queda fuera del backend obligatorio y se reservará
 para una fase posterior si el alcance lo permite.
