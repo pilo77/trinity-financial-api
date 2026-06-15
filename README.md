@@ -84,6 +84,10 @@ Las decisiones y reglas completas están en:
 - Spring Boot Actuator
 - JUnit 5, Mockito y MockMvc
 - Docker Compose
+- Angular 21
+- Docker multi-stage para Spring Boot
+- Vercel como destino del frontend
+- Render o Railway como destino del backend y PostgreSQL
 
 ## Configuración
 
@@ -99,6 +103,11 @@ La aplicación utilizará variables de entorno:
 | `DB_USERNAME` | Usuario de base de datos |
 | `DB_PASSWORD` | Contraseña de base de datos |
 | `CORS_ALLOWED_ORIGINS` | Orígenes CORS permitidos |
+| `FRONTEND_ALLOWED_ORIGINS` | Orígenes CORS del frontend; variable preferida |
+| `SPRING_DATASOURCE_URL` | URL JDBC de PostgreSQL en producción |
+| `SPRING_DATASOURCE_USERNAME` | Usuario PostgreSQL en producción |
+| `SPRING_DATASOURCE_PASSWORD` | Contraseña PostgreSQL en producción |
+| `PORT` | Puerto inyectado por la plataforma cloud |
 
 `.env.example` solo contiene nombres de variables. Los valores reales deben
 permanecer en `.env` o en el gestor de secretos del ambiente.
@@ -112,6 +121,7 @@ commits ni en capturas compartidas.
 - `application-local.yml`: desarrollo local mediante variables de entorno.
 - `application-test.yml`: configuración aislada para pruebas.
 - `application-cloud.yml`: configuración cloud basada en variables de entorno.
+- `application-prod.yml`: configuración productiva para Render o Railway.
 
 La configuración común está en `application.yml`; los perfiles `local`,
 `test` y `cloud` separan las conexiones y ajustes por ambiente.
@@ -140,25 +150,33 @@ SPRING_PROFILES_ACTIVE=local
 DATABASE_URL=jdbc:postgresql://localhost:5432/<database>
 ```
 
-3. Levantar PostgreSQL:
+3. Levantar PostgreSQL y backend con Docker:
 
 ```powershell
-docker compose up -d
+docker compose up --build -d
 docker compose ps
 ```
 
-4. Ejecutar pruebas y aplicación:
+4. Ejecutar pruebas backend:
 
 ```powershell
 .\mvnw.cmd clean verify
-.\mvnw.cmd spring-boot:run
 ```
 
-5. Validar:
+5. Ejecutar el frontend:
+
+```powershell
+Set-Location frontend
+npm ci
+npm start
+```
+
+6. Validar:
 
 - Health: `http://localhost:8080/actuator/health`
 - OpenAPI JSON: `http://localhost:8080/v3/api-docs`
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
+- Frontend: `http://localhost:4200`
 
 Para detener la base de datos sin eliminar su volumen:
 
@@ -168,6 +186,26 @@ docker compose down
 
 No se debe usar `docker compose down -v` sin autorización, porque elimina los
 datos locales del volumen.
+
+## Despliegue
+
+La arquitectura objetivo usa:
+
+- Angular en Vercel.
+- Spring Boot como contenedor Docker en Render o Railway.
+- PostgreSQL administrado en la misma plataforma y region del backend.
+
+Vercel usa `frontend` como Root Directory, `npm run build:vercel` como Build
+Command y `dist/trinity-financial-web/browser` como Output Directory. La
+variable `API_URL` se inyecta durante el build y no se versiona.
+
+El backend usa el perfil `prod`, health check `/actuator/health` y CORS
+configurable con `FRONTEND_ALLOWED_ORIGINS`.
+
+Documentacion:
+
+- [Plan de despliegue](docs/DEPLOYMENT_PLAN.md)
+- [Guia cloud](docs/CLOUD_DEPLOYMENT.md)
 
 ## Git Flow simplificado
 

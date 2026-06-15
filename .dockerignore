@@ -1,0 +1,17 @@
+.git
+.github
+.idea
+.vscode
+frontend
+target
+build
+dist
+node_modules
+coverage
+logs
+*.log
+.env
+.env.*
+!.env.example
+docs
+README.md

@@ -33,5 +33,13 @@ npm test -- --watch=false
 npm run build
 ```
 
-El build productivo utiliza `src/environments/environment.prod.ts` mediante
-`fileReplacements`. La configuracion cloud se documenta en la fase HU-009.
+El build productivo genera el ambiente a partir de `API_URL`:
+
+```powershell
+$env:API_URL="https://api.example.invalid/api/v1"
+npm run build:vercel
+Remove-Item Env:API_URL
+```
+
+Vercel debe usar `frontend` como Root Directory. Los detalles completos estan
+en `../docs/CLOUD_DEPLOYMENT.md`.
