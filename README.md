@@ -1,8 +1,8 @@
 # Trinity Financial API
 
 API REST para administrar clientes, cuentas de ahorro, cuentas corrientes y
-transacciones financieras. El proyecto se desarrollará como un monolito modular
-en Java y Spring Boot, con PostgreSQL y arquitectura hexagonal simplificada.
+transacciones financieras. El proyecto se desarrolla como un monolito modular
+en Java y Spring Boot, con PostgreSQL y arquitectura por capas.
 
 ## Estado actual
 
@@ -19,6 +19,13 @@ Módulos implementados:
 - Transacciones financieras.
 - Consulta de estado de cuenta.
 - Frontend Angular financiero para demostración profesional.
+
+## Entrega tecnica
+
+La evidencia formal de arquitectura, patrones, SOLID, ACID, DDL/DML, pruebas,
+Docker, cloud, frontend y Git Flow esta documentada en:
+
+- [Evidencia tecnica de entrega](docs/TECHNICAL_DELIVERY_EVIDENCE.md)
 
 ## Alcance MVP
 
