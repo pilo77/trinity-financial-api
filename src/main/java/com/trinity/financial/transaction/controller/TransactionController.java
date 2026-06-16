@@ -5,9 +5,13 @@ import com.trinity.financial.transaction.dto.TransactionResponse;
 import com.trinity.financial.transaction.dto.TransferRequest;
 import com.trinity.financial.transaction.dto.WithdrawalRequest;
 import com.trinity.financial.transaction.service.TransactionService;
+import com.trinity.financial.shared.api.PageResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,6 +47,13 @@ public class TransactionController {
     public ResponseEntity<TransactionResponse> transfer(
             @Valid @RequestBody TransferRequest request) {
         return created(transactionService.transfer(request));
+    }
+
+    @GetMapping
+    public PageResponse<TransactionResponse> findAll(
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        return PageResponse.from(transactionService.findAll(pageable));
     }
 
     @GetMapping("/{id}")

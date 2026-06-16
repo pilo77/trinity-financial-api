@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AccountMovementRepository extends JpaRepository<AccountMovementEntity, UUID> {
@@ -15,22 +13,21 @@ public interface AccountMovementRepository extends JpaRepository<AccountMovement
     List<AccountMovementEntity> findByFinancialTransactionIdOrderByCreatedAtAscIdAsc(
             UUID financialTransactionId);
 
-    @Query(
-        value = """
-            select movement from AccountMovementEntity movement
-            where movement.account.id = :accountId
-              and (:startDate is null or movement.createdAt >= :startDate)
-              and (:endDate is null or movement.createdAt <= :endDate)
-            """,
-        countQuery = """
-            select count(movement) from AccountMovementEntity movement
-            where movement.account.id = :accountId
-              and (:startDate is null or movement.createdAt >= :startDate)
-              and (:endDate is null or movement.createdAt <= :endDate)
-            """)
-    Page<AccountMovementEntity> findStatementMovements(
-        @Param("accountId") UUID accountId,
-        @Param("startDate") LocalDateTime startDate,
-        @Param("endDate") LocalDateTime endDate,
-        Pageable pageable);
+    Page<AccountMovementEntity> findByAccountId(UUID accountId, Pageable pageable);
+
+    Page<AccountMovementEntity> findByAccountIdAndCreatedAtGreaterThanEqual(
+            UUID accountId,
+            LocalDateTime startDate,
+            Pageable pageable);
+
+    Page<AccountMovementEntity> findByAccountIdAndCreatedAtLessThanEqual(
+            UUID accountId,
+            LocalDateTime endDate,
+            Pageable pageable);
+
+    Page<AccountMovementEntity> findByAccountIdAndCreatedAtBetween(
+            UUID accountId,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            Pageable pageable);
 }

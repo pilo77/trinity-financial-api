@@ -73,10 +73,8 @@ class AccountStatementServiceTest {
 
         when(accountRepository.findByAccountNumber("5300000001"))
                 .thenReturn(Optional.of(account));
-        when(movementRepository.findStatementMovements(
+        when(movementRepository.findByAccountId(
                 ACCOUNT_ID,
-                null,
-                null,
                 pageRequest))
                 .thenReturn(new PageImpl<>(new ArrayList<>(List.of(movement1, movement2)), pageRequest, 2));
 
@@ -101,10 +99,8 @@ class AccountStatementServiceTest {
 
         when(accountRepository.findByAccountNumber("5300000001"))
                 .thenReturn(Optional.of(account));
-        when(movementRepository.findStatementMovements(
+        when(movementRepository.findByAccountId(
                 ACCOUNT_ID,
-                null,
-                null,
                 pageRequest))
                 .thenReturn(new PageImpl<>(new ArrayList<>(), pageRequest, 0));
 
@@ -149,7 +145,7 @@ class AccountStatementServiceTest {
         PageRequest pageRequest = PageRequest.of(2, 5, Sort.by(Sort.Direction.ASC, "amount"));
         when(accountRepository.findByAccountNumber("5300000001"))
                 .thenReturn(Optional.of(account));
-        when(movementRepository.findStatementMovements(
+        when(movementRepository.findByAccountIdAndCreatedAtBetween(
                 ACCOUNT_ID,
                 LocalDateTime.of(2026, 1, 1, 0, 0),
                 LocalDateTime.of(2026, 12, 31, 23, 59),
@@ -163,7 +159,7 @@ class AccountStatementServiceTest {
                 pageRequest);
 
         ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
-        verify(movementRepository).findStatementMovements(
+        verify(movementRepository).findByAccountIdAndCreatedAtBetween(
                 any(UUID.class),
                 any(LocalDateTime.class),
                 any(LocalDateTime.class),
@@ -171,6 +167,40 @@ class AccountStatementServiceTest {
         assertThat(captor.getValue().getPageNumber()).isEqualTo(2);
         assertThat(captor.getValue().getPageSize()).isEqualTo(5);
         assertThat(captor.getValue().getSort().getOrderFor("amount")).isNotNull();
+    }
+
+    @Test
+    void usesStartDateQueryWhenOnlyStartDateIsProvided() {
+        AccountEntity account = account("5300000001", "250.00");
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        LocalDateTime startDate = LocalDateTime.of(2026, 1, 1, 0, 0);
+        when(accountRepository.findByAccountNumber("5300000001"))
+                .thenReturn(Optional.of(account));
+        when(movementRepository.findByAccountIdAndCreatedAtGreaterThanEqual(
+                ACCOUNT_ID, startDate, pageRequest))
+                .thenReturn(new PageImpl<>(new ArrayList<>(), pageRequest, 0));
+
+        service.getStatement("5300000001", startDate, null, pageRequest);
+
+        verify(movementRepository).findByAccountIdAndCreatedAtGreaterThanEqual(
+                ACCOUNT_ID, startDate, pageRequest);
+    }
+
+    @Test
+    void usesEndDateQueryWhenOnlyEndDateIsProvided() {
+        AccountEntity account = account("5300000001", "250.00");
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        LocalDateTime endDate = LocalDateTime.of(2026, 12, 31, 23, 59);
+        when(accountRepository.findByAccountNumber("5300000001"))
+                .thenReturn(Optional.of(account));
+        when(movementRepository.findByAccountIdAndCreatedAtLessThanEqual(
+                ACCOUNT_ID, endDate, pageRequest))
+                .thenReturn(new PageImpl<>(new ArrayList<>(), pageRequest, 0));
+
+        service.getStatement("5300000001", null, endDate, pageRequest);
+
+        verify(movementRepository).findByAccountIdAndCreatedAtLessThanEqual(
+                ACCOUNT_ID, endDate, pageRequest);
     }
 
     private AccountEntity account(String number, String balance) {

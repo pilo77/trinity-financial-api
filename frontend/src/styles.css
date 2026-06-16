@@ -456,6 +456,32 @@ label textarea:focus {
   grid-column: 1 / -1;
 }
 
+.detail-grid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+
+.detail-grid div {
+  background: rgba(118, 80, 199, 0.06);
+  border: 1px solid #e6dff4;
+  border-radius: 16px;
+  padding: 0.85rem;
+}
+
+.detail-grid dt {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+}
+
+.detail-grid dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
 label.check {
   align-items: center;
   display: flex;
