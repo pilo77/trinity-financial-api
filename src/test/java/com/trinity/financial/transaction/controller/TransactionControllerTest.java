@@ -24,6 +24,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -119,6 +121,22 @@ class TransactionControllerTest {
         mockMvc.perform(get("/api/v1/transactions/{id}", TRANSACTION_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(TRANSACTION_ID.toString()));
+    }
+
+    @Test
+    void listsTransactionsWithPagination() throws Exception {
+        when(transactionService.findAll(any()))
+                .thenReturn(new PageImpl<>(
+                        List.of(response(TransactionType.DEPOSIT)),
+                        PageRequest.of(0, 10),
+                        1));
+
+        mockMvc.perform(get("/api/v1/transactions")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(TRANSACTION_ID.toString()))
+                .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     @Test

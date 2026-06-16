@@ -41,6 +41,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionServiceTest {
@@ -223,6 +226,31 @@ class TransactionServiceTest {
                 .thenReturn(List.of(movement));
 
         assertThat(service.findById(id).movements()).hasSize(1);
+    }
+
+    @Test
+    void listsTransactionsWithTheirMovements() {
+        UUID id = UUID.randomUUID();
+        AccountEntity account = account("5300000001", AccountStatus.ACTIVE, "100.00");
+        FinancialTransactionEntity transaction = new FinancialTransactionEntity(
+                id, com.trinity.financial.transaction.entity.TransactionType.DEPOSIT,
+                amount("10.00"), null, account,
+                com.trinity.financial.transaction.entity.TransactionStatus.SUCCESS,
+                null, NOW, NOW);
+        AccountMovementEntity movement = new AccountMovementEntity(
+                UUID.randomUUID(), account, transaction, MovementType.CREDIT,
+                amount("10.00"), amount("100.00"), NOW);
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        when(transactionRepository.findAll(pageRequest))
+                .thenReturn(new PageImpl<>(List.of(transaction), pageRequest, 1));
+        when(movementRepository.findByFinancialTransactionIdOrderByCreatedAtAscIdAsc(id))
+                .thenReturn(List.of(movement));
+
+        Page<TransactionResponse> response = service.findAll(pageRequest);
+
+        assertThat(response.getTotalElements()).isEqualTo(1);
+        assertThat(response.getContent()).singleElement()
+                .satisfies(item -> assertThat(item.movements()).hasSize(1));
     }
 
     private AccountEntity account(String number, AccountStatus status, String balance) {

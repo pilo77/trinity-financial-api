@@ -1,4 +1,4 @@
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize, forkJoin } from 'rxjs';
@@ -8,7 +8,7 @@ import { Account, AccountStatus, AccountType, Customer } from '../../core/models
 
 @Component({
   selector: 'app-accounts',
-  imports: [CurrencyPipe, ReactiveFormsModule],
+  imports: [CurrencyPipe, DatePipe, ReactiveFormsModule],
   template: `
     <div class="page-header">
       <div>
@@ -55,6 +55,7 @@ import { Account, AccountStatus, AccountType, Customer } from '../../core/models
                   <td>{{ account.balance | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</td>
                   <td>{{ account.availableBalance | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</td>
                   <td class="actions">
+                    <button type="button" (click)="showDetail(account)">Ver detalle</button>
                     @if (account.status !== 'CANCELLED') {
                       <button type="button" (click)="toggleStatus(account)">
                         {{ account.status === 'ACTIVE' ? 'Inactivar' : 'Activar' }}
@@ -110,6 +111,32 @@ import { Account, AccountStatus, AccountType, Customer } from '../../core/models
         </section>
       </div>
     }
+
+    @if (selectedAccount(); as account) {
+      <div class="modal-backdrop" (click)="closeDetail()">
+        <section class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+          <div class="modal-heading">
+            <div>
+              <span class="eyebrow">Detalle de cuenta</span>
+              <h2>{{ account.accountNumber }}</h2>
+            </div>
+            <button type="button" aria-label="Cerrar detalle" (click)="closeDetail()">×</button>
+          </div>
+          <dl class="detail-grid">
+            <div><dt>ID</dt><dd class="mono">{{ account.id }}</dd></div>
+            <div><dt>Tipo de cuenta</dt><dd>{{ account.accountType === 'SAVINGS' ? 'Cuenta de ahorros' : 'Cuenta corriente' }}</dd></div>
+            <div><dt>Numero de cuenta</dt><dd>{{ account.accountNumber }}</dd></div>
+            <div><dt>Estado</dt><dd>{{ account.status }}</dd></div>
+            <div><dt>Saldo</dt><dd>{{ account.balance | currency: 'COP' : 'symbol-narrow' : '1.0-2' }}</dd></div>
+            <div><dt>Saldo disponible</dt><dd>{{ account.availableBalance | currency: 'COP' : 'symbol-narrow' : '1.0-2' }}</dd></div>
+            <div><dt>Exenta GMF</dt><dd>{{ account.gmfExempt ? 'Si' : 'No' }}</dd></div>
+            <div><dt>Fecha de creacion</dt><dd>{{ account.createdAt | date: 'medium' }}</dd></div>
+            <div><dt>Fecha de modificacion</dt><dd>{{ account.updatedAt | date: 'medium' }}</dd></div>
+            <div><dt>Cliente asociado</dt><dd>{{ customerName(account.customerId) }}</dd></div>
+          </dl>
+        </section>
+      </div>
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -122,6 +149,7 @@ export class Accounts {
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
   protected readonly formOpen = signal(false);
+  protected readonly selectedAccount = signal<Account | null>(null);
   protected readonly typeFilter = signal<AccountType | ''>('');
   protected readonly statusFilter = signal<AccountStatus | ''>('');
   protected readonly message = signal('');
@@ -166,6 +194,14 @@ export class Accounts {
       });
   }
 
+  protected showDetail(account: Account): void {
+    this.selectedAccount.set(account);
+  }
+
+  protected closeDetail(): void {
+    this.selectedAccount.set(null);
+  }
+
   protected toggleStatus(account: Account): void {
     const status = account.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
     this.api.updateAccountStatus(account.id, status).subscribe({
@@ -196,6 +232,10 @@ export class Accounts {
         next: ({ accounts, customers }) => {
           this.accounts.set(accounts.content);
           this.customers.set(customers.content);
+          const selected = this.selectedAccount();
+          if (selected) {
+            this.selectedAccount.set(accounts.content.find((account) => account.id === selected.id) ?? null);
+          }
         },
         error: (error: Error) => this.error.set(error.message),
       });

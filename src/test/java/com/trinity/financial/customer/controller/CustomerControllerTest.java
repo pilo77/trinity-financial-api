@@ -84,6 +84,27 @@ class CustomerControllerTest {
     }
 
     @Test
+    void rejectsEmailsWithoutDomainDot() throws Exception {
+        for (String email : List.of("major@gmailcom", "jskdjflks", "plain-text")) {
+            CreateCustomerRequest request = new CreateCustomerRequest(
+                    "CC",
+                    UUID.randomUUID().toString(),
+                    "Carlos",
+                    "Villamil",
+                    email,
+                    null,
+                    LocalDate.of(2000, 1, 1));
+
+            mockMvc.perform(post("/api/v1/customers")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                    .andExpect(jsonPath("$.fieldErrors[?(@.field == 'email')]").exists());
+        }
+    }
+
+    @Test
     void listsCustomers() throws Exception {
         when(customerService.findAll(any())).thenReturn(new PageImpl<>(List.of(customerResponse())));
 
