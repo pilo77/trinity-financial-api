@@ -1,9 +1,9 @@
 package com.trinity.financial.customer.dto;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
@@ -25,7 +25,9 @@ public record UpdateCustomerRequest(
         String lastName,
 
         @NotBlank(message = "El correo es obligatorio.")
-        @Email(message = "El correo no tiene un formato válido.")
+        @Pattern(
+                regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
+                message = "Ingrese un correo válido con formato nombre@dominio.com.")
         @Size(max = 254, message = "El correo no puede superar 254 caracteres.")
         String email,
 

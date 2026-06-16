@@ -23,6 +23,8 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -143,6 +145,15 @@ public class TransactionService {
         List<AccountMovementEntity> movements =
                 movementRepository.saveAllAndFlush(List.of(debit, credit));
         return transactionMapper.toResponse(transaction, movements);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<TransactionResponse> findAll(Pageable pageable) {
+        return transactionRepository.findAll(pageable)
+                .map(transaction -> transactionMapper.toResponse(
+                        transaction,
+                        movementRepository.findByFinancialTransactionIdOrderByCreatedAtAscIdAsc(
+                                transaction.getId())));
     }
 
     @Transactional(readOnly = true)

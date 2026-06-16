@@ -5,6 +5,7 @@ import {
   distinctAccountsValidator,
   minimumAgeValidator,
   positiveAmountValidator,
+  strictEmailValidator,
 } from './financial-validators';
 
 describe('financial validators', () => {
@@ -20,6 +21,15 @@ describe('financial validators', () => {
     const validator = minimumAgeValidator(18, () => new Date(2026, 5, 15));
 
     expect(validator(control)).toBeNull();
+  });
+
+  it('rejects emails without a domain dot', () => {
+    expect(strictEmailValidator(new FormControl('major@gmailcom'))).toEqual({ strictEmail: true });
+    expect(strictEmailValidator(new FormControl('jskdjflks'))).toEqual({ strictEmail: true });
+  });
+
+  it('accepts an email with local part, domain and top-level domain', () => {
+    expect(strictEmailValidator(new FormControl('nombre@dominio.com'))).toBeNull();
   });
 
   it('rejects a statement start date after the end date', () => {

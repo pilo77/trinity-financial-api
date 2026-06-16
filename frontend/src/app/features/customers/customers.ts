@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 
 import { FinancialApiService } from '../../core/financial-api.service';
-import { minimumAgeValidator } from '../../core/financial-validators';
+import { minimumAgeValidator, strictEmailValidator } from '../../core/financial-validators';
 import { Customer, CustomerRequest } from '../../core/models';
 
 @Component({
@@ -59,6 +59,7 @@ import { Customer, CustomerRequest } from '../../core/models';
                   </td>
                   <td>{{ customer.createdAt | date: 'dd/MM/yyyy' }}</td>
                   <td class="actions">
+                    <button type="button" (click)="showDetail(customer)">Ver detalle</button>
                     <button type="button" (click)="openEdit(customer)">Editar</button>
                     <button class="danger-link" type="button" (click)="remove(customer)">Eliminar</button>
                   </td>
@@ -93,22 +94,42 @@ import { Customer, CustomerRequest } from '../../core/models';
               </label>
               <label>Numero de documento
                 <input formControlName="documentNumber" maxlength="30" />
+                @if (showFieldError('documentNumber', 'required')) {
+                  <small class="field-error">El numero de documento es obligatorio.</small>
+                }
               </label>
               <label>Nombres
                 <input formControlName="firstName" maxlength="100" />
+                @if (showFieldError('firstName', 'required')) {
+                  <small class="field-error">El nombre es obligatorio.</small>
+                } @else if (showFieldError('firstName', 'minlength')) {
+                  <small class="field-error">El nombre debe tener al menos 2 caracteres.</small>
+                }
               </label>
               <label>Apellidos
                 <input formControlName="lastName" maxlength="100" />
+                @if (showFieldError('lastName', 'required')) {
+                  <small class="field-error">El apellido es obligatorio.</small>
+                } @else if (showFieldError('lastName', 'minlength')) {
+                  <small class="field-error">El apellido debe tener al menos 2 caracteres.</small>
+                }
               </label>
               <label>Correo electronico
                 <input formControlName="email" type="email" maxlength="254" />
+                @if (showFieldError('email', 'required')) {
+                  <small class="field-error">El correo electronico es obligatorio.</small>
+                } @else if (showFieldError('email', 'strictEmail')) {
+                  <small class="field-error">Ingrese un correo valido con formato nombre@dominio.com.</small>
+                }
               </label>
               <label>Telefono
                 <input formControlName="phone" maxlength="30" />
               </label>
               <label>Fecha de nacimiento
                 <input formControlName="birthDate" type="date" />
-                @if ((form.controls.birthDate.dirty || form.controls.birthDate.touched) && form.controls.birthDate.hasError('minimumAge')) {
+                @if (showFieldError('birthDate', 'required')) {
+                  <small class="field-error">La fecha de nacimiento es obligatoria.</small>
+                } @else if (showFieldError('birthDate', 'minimumAge')) {
                   <small class="field-error">El cliente debe tener al menos 18 anos.</small>
                 }
               </label>
@@ -120,6 +141,32 @@ import { Customer, CustomerRequest } from '../../core/models';
               </button>
             </div>
           </form>
+        </section>
+      </div>
+    }
+
+    @if (selectedCustomer(); as customer) {
+      <div class="modal-backdrop" (click)="closeDetail()">
+        <section class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+          <div class="modal-heading">
+            <div>
+              <span class="eyebrow">Detalle de cliente</span>
+              <h2>{{ customer.firstName }} {{ customer.lastName }}</h2>
+            </div>
+            <button type="button" aria-label="Cerrar detalle" (click)="closeDetail()">×</button>
+          </div>
+          <dl class="detail-grid">
+            <div><dt>ID</dt><dd class="mono">{{ customer.id }}</dd></div>
+            <div><dt>Tipo de identificacion</dt><dd>{{ customer.documentType }}</dd></div>
+            <div><dt>Numero de identificacion</dt><dd>{{ customer.documentNumber }}</dd></div>
+            <div><dt>Nombres</dt><dd>{{ customer.firstName }}</dd></div>
+            <div><dt>Apellidos</dt><dd>{{ customer.lastName }}</dd></div>
+            <div><dt>Email</dt><dd>{{ customer.email }}</dd></div>
+            <div><dt>Telefono</dt><dd>{{ customer.phone || 'No registrado' }}</dd></div>
+            <div><dt>Fecha de nacimiento</dt><dd>{{ customer.birthDate }}</dd></div>
+            <div><dt>Fecha de creacion</dt><dd>{{ customer.createdAt | date: 'medium' }}</dd></div>
+            <div><dt>Fecha de modificacion</dt><dd>{{ customer.updatedAt | date: 'medium' }}</dd></div>
+          </dl>
         </section>
       </div>
     }
@@ -135,6 +182,7 @@ export class Customers {
   protected readonly saving = signal(false);
   protected readonly formOpen = signal(false);
   protected readonly editingId = signal<string | null>(null);
+  protected readonly selectedCustomer = signal<Customer | null>(null);
   protected readonly query = signal('');
   protected readonly message = signal('');
   protected readonly error = signal('');
@@ -144,7 +192,7 @@ export class Customers {
     documentNumber: ['', [Validators.required, Validators.maxLength(30)]],
     firstName: ['', [Validators.required, Validators.minLength(2)]],
     lastName: ['', [Validators.required, Validators.minLength(2)]],
-    email: ['', [Validators.required, Validators.email]],
+    email: ['', [Validators.required, strictEmailValidator]],
     phone: [''],
     birthDate: ['', [Validators.required, minimumAgeValidator(18)]],
   });
@@ -181,6 +229,14 @@ export class Customers {
       birthDate: customer.birthDate,
     });
     this.formOpen.set(true);
+  }
+
+  protected showDetail(customer: Customer): void {
+    this.selectedCustomer.set(customer);
+  }
+
+  protected closeDetail(): void {
+    this.selectedCustomer.set(null);
   }
 
   protected closeForm(): void {
@@ -226,8 +282,19 @@ export class Customers {
       .getCustomers()
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: (response) => this.customers.set(response.content),
+        next: (response) => {
+          this.customers.set(response.content);
+          const selected = this.selectedCustomer();
+          if (selected) {
+            this.selectedCustomer.set(response.content.find((customer) => customer.id === selected.id) ?? null);
+          }
+        },
         error: (error: Error) => this.error.set(error.message),
       });
+  }
+
+  protected showFieldError(controlName: keyof CustomerRequest, errorName: string): boolean {
+    const control = this.form.controls[controlName];
+    return (control.dirty || control.touched) && control.hasError(errorName);
   }
 }

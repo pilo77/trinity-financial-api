@@ -1,5 +1,15 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
+const STRICT_EMAIL_PATTERN = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+export const strictEmailValidator: ValidatorFn = (
+  control: AbstractControl,
+): ValidationErrors | null => {
+  if (!control.value) return null;
+
+  return STRICT_EMAIL_PATTERN.test(String(control.value)) ? null : { strictEmail: true };
+};
+
 export const minimumAgeValidator = (
   minimumAge: number,
   todayProvider: () => Date = () => new Date(),

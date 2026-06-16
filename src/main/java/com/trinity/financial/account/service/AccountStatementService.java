@@ -13,6 +13,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class AccountStatementService {
                         "ACCOUNT_NOT_FOUND",
                         "No se encontró la cuenta solicitada."));
 
-        Page<AccountMovementEntity> page = movementRepository.findStatementMovements(
+        Page<AccountMovementEntity> page = findMovements(
                 account.getId(), startDate, endDate, pageable);
 
         List<AccountStatementMovementResponse> movements = page.getContent().stream()
@@ -87,6 +88,26 @@ public class AccountStatementService {
                     "INVALID_ACCOUNT_NUMBER",
                     "El número de cuenta debe contener exactamente 10 dígitos.");
         }
+    }
+
+    private Page<AccountMovementEntity> findMovements(
+            UUID accountId,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            Pageable pageable) {
+        if (startDate != null && endDate != null) {
+            return movementRepository.findByAccountIdAndCreatedAtBetween(
+                    accountId, startDate, endDate, pageable);
+        }
+        if (startDate != null) {
+            return movementRepository.findByAccountIdAndCreatedAtGreaterThanEqual(
+                    accountId, startDate, pageable);
+        }
+        if (endDate != null) {
+            return movementRepository.findByAccountIdAndCreatedAtLessThanEqual(
+                    accountId, endDate, pageable);
+        }
+        return movementRepository.findByAccountId(accountId, pageable);
     }
 
     private void validateDateRange(LocalDateTime startDate, LocalDateTime endDate) {
